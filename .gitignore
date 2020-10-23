@@ -1,0 +1,11 @@
+# Created by .gitignore support plugin (hsz.mobi)
+### Java template
+
+.idea/
+*.iml
+target/
+data/
+libs/
+.classpath
+.project
+.settings
