@@ -13,6 +13,8 @@
         <cryptobox.version>0.3.0</cryptobox.version>
         <jackson.version>2.12.0-rc1</jackson.version>
         <protobuf.version>3.13.0</protobuf.version>
+        <jdbi.version>3.14.1</jdbi.version>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <repositories>
@@ -57,17 +59,12 @@
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-core</artifactId>
-            <version>3.17.0</version>
+            <version>${jdbi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-sqlobject</artifactId>
-            <version>3.14.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdbi</groupId>
-            <artifactId>jdbi3-core</artifactId>
-            <version>3.14.1</version>
+            <version>${jdbi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -95,6 +92,7 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>6.1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
