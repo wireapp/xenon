@@ -39,7 +39,7 @@ public class IdentitiesDAOTest {
         final String id = UUID.randomUUID().toString();
 
         final int insert = identitiesDAO.insert(id, id.getBytes());
-        final byte[] bytes = identitiesDAO.get(id);
+        final byte[] bytes = identitiesDAO.get(id).data;
         final int delete = identitiesDAO.delete(id);
     }
 }

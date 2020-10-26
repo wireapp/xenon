@@ -26,7 +26,8 @@ public class JdbiStorage implements IStorage {
 
     @Override
     public byte[] fetchIdentity(String id) {
-        return identitiesDAO.get(id);
+        final IdentitiesDAO._Identity identity = identitiesDAO.get(id);
+        return identity != null ? identity.data : null;
     }
 
     @Override
