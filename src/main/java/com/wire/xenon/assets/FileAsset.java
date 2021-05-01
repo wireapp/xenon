@@ -25,59 +25,40 @@ import com.wire.xenon.tools.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.UUID;
 
-public class FileAsset implements IGeneric, IAsset {
-    static private final SecureRandom random = new SecureRandom();
-
-    private final String mimeType;
-    private final UUID messageId;
-    private final byte[] encBytes;
-    private final byte[] otrKey;
-    private final byte[] sha256;
-
-    private String assetKey;
-    private String assetToken;
-    private String retention = "persistent";
-    private boolean readReceiptsEnabled = true;
-
+public class FileAsset extends AssetBase {
     public FileAsset(File file, String mimeType, UUID messageId) throws Exception {
-        this(readFile(file), mimeType, messageId);
+        super(messageId, mimeType, readFile(file));
     }
 
     public FileAsset(byte[] bytes, String mimeType, UUID messageId) throws Exception {
-        this.mimeType = mimeType;
-        this.messageId = messageId;
-
-        otrKey = newOtrKey();
-        encBytes = encrypt(bytes);
-        sha256 = getSha256(encBytes);
+        super(messageId, mimeType, bytes);
     }
 
     public FileAsset(String assetKey, String assetToken, byte[] sha256, byte[] otrKey, UUID messageId) {
-        this.messageId = messageId;
+        super(messageId, null);
         this.assetKey = assetKey;
         this.assetToken = assetToken;
         this.sha256 = sha256;
         this.otrKey = otrKey;
-        mimeType = null;
-        encBytes = null;
     }
 
     @Override
     public Messages.GenericMessage createGenericMsg() {
         // Remote
         Messages.Asset.RemoteData.Builder remote = Messages.Asset.RemoteData.newBuilder()
-                .setOtrKey(ByteString.copyFrom(otrKey))
-                .setSha256(ByteString.copyFrom(sha256))
-                .setAssetId(assetKey)
-                .setAssetToken(assetToken);
+                .setOtrKey(ByteString.copyFrom(getOtrKey()))
+                .setSha256(ByteString.copyFrom(getSha256()))
+                .setAssetId(getAssetKey());
+
+        // Only set token on private assets
+        if (getAssetToken() != null) {
+            remote.setAssetToken(getAssetToken());
+        }
 
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()
-                .setExpectsReadConfirmation(readReceiptsEnabled)
+                .setExpectsReadConfirmation(isReadReceiptsEnabled())
                 .setUploaded(remote);
 
         return Messages.GenericMessage.newBuilder()
@@ -86,88 +67,11 @@ public class FileAsset implements IGeneric, IAsset {
                 .build();
     }
 
-    public void setAssetKey(String assetKey) {
-        this.assetKey = assetKey;
-    }
-
-    public void setAssetToken(String assetToken) {
-        this.assetToken = assetToken;
-    }
-
-    public byte[] getOtrKey() {
-        return otrKey;
-    }
-
-    public byte[] getSha256() {
-        return sha256;
-    }
-
-    public String getAssetKey() {
-        return assetKey;
-    }
-
-    public String getAssetToken() {
-        return assetToken;
-    }
-
-    @Override
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    @Override
-    public String getRetention() {
-        return retention;
-    }
-
-    public void setRetention(String retention) {
-        this.retention = retention;
-    }
-
-    @Override
-    public byte[] getEncryptedData() {
-        return encBytes;
-    }
-
-    @Override
-    public boolean isPublic() {
-        return false;
-    }
-
-    @Override
-    public UUID getMessageId() {
-        return messageId;
-    }
-
-    private static byte[] getSha256(byte[] bytes) throws NoSuchAlgorithmException {
-        return MessageDigest.getInstance("SHA-256").digest(bytes);
-    }
-
-    public boolean isReadReceiptsEnabled() {
-        return readReceiptsEnabled;
-    }
-
-    public void setReadReceiptsEnabled(boolean readReceiptsEnabled) {
-        this.readReceiptsEnabled = readReceiptsEnabled;
-    }
-
-    private static byte[] newOtrKey() {
-        byte[] otrKey = new byte[32];
-        random.nextBytes(otrKey);
-        return otrKey;
-    }
-
     private static byte[] readFile(File file) throws IOException {
         byte[] bytes;
         try (FileInputStream input = new FileInputStream(file)) {
             bytes = Util.toByteArray(input);
         }
         return bytes;
-    }
-
-    private byte[] encrypt(byte[] bytes) throws Exception {
-        byte[] iv = new byte[16];
-        random.nextBytes(iv);
-        return Util.encrypt(otrKey, bytes, iv);
     }
 }
