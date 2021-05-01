@@ -35,6 +35,7 @@ public class VideoAsset implements IGeneric, IAsset {
     private final String mimeType;
     private String assetKey;
     private String assetToken;
+    private String retention = "persistent";
 
     public VideoAsset(byte[] bytes, String mime, UUID messageId) throws Exception {
         this.messageId = messageId;
@@ -85,7 +86,11 @@ public class VideoAsset implements IGeneric, IAsset {
 
     @Override
     public String getRetention() {
-        return "volatile";
+        return retention;
+    }
+
+    public void setRetention(String retention) {
+        this.retention = retention;
     }
 
     @Override

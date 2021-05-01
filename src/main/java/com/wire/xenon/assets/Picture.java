@@ -37,6 +37,7 @@ import java.util.UUID;
 public class Picture implements IGeneric, IAsset {
     static private final SecureRandom random = new SecureRandom();
 
+    private final UUID messageId = UUID.randomUUID();
     private byte[] imageData;
     private String mimeType;
     private int width;
@@ -48,8 +49,8 @@ public class Picture implements IGeneric, IAsset {
     private String assetKey;
     private String assetToken;
     private boolean isPublic;
-    private String retention = "expiring";
-    private UUID messageId = UUID.randomUUID();
+    private String retention = "persistent";
+    private boolean readReceiptsEnabled = true;
     private long expires;
 
     public Picture(byte[] bytes, String mime) throws IOException {
@@ -126,6 +127,7 @@ public class Picture implements IGeneric, IAsset {
             remoteData.setAssetToken(assetToken);
 
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()
+                .setExpectsReadConfirmation(readReceiptsEnabled)
                 .setUploaded(remoteData)
                 .setOriginal(original);
 
@@ -244,6 +246,14 @@ public class Picture implements IGeneric, IAsset {
 
     public void setExpires(long expires) {
         this.expires = expires;
+    }
+
+    public boolean isReadReceiptsEnabled() {
+        return readReceiptsEnabled;
+    }
+
+    public void setReadReceiptsEnabled(boolean readReceiptsEnabled) {
+        this.readReceiptsEnabled = readReceiptsEnabled;
     }
 
     private BufferedImage loadBufferImage(byte[] imageData) throws IOException {

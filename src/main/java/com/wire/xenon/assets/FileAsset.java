@@ -41,6 +41,8 @@ public class FileAsset implements IGeneric, IAsset {
 
     private String assetKey;
     private String assetToken;
+    private String retention = "persistent";
+    private boolean readReceiptsEnabled = true;
 
     public FileAsset(File file, String mimeType, UUID messageId) throws Exception {
         this(readFile(file), mimeType, messageId);
@@ -75,6 +77,7 @@ public class FileAsset implements IGeneric, IAsset {
                 .setAssetToken(assetToken);
 
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()
+                .setExpectsReadConfirmation(readReceiptsEnabled)
                 .setUploaded(remote);
 
         return Messages.GenericMessage.newBuilder()
@@ -91,6 +94,22 @@ public class FileAsset implements IGeneric, IAsset {
         this.assetToken = assetToken;
     }
 
+    public byte[] getOtrKey() {
+        return otrKey;
+    }
+
+    public byte[] getSha256() {
+        return sha256;
+    }
+
+    public String getAssetKey() {
+        return assetKey;
+    }
+
+    public String getAssetToken() {
+        return assetToken;
+    }
+
     @Override
     public String getMimeType() {
         return mimeType;
@@ -98,7 +117,11 @@ public class FileAsset implements IGeneric, IAsset {
 
     @Override
     public String getRetention() {
-        return "expiring";
+        return retention;
+    }
+
+    public void setRetention(String retention) {
+        this.retention = retention;
     }
 
     @Override
@@ -118,6 +141,14 @@ public class FileAsset implements IGeneric, IAsset {
 
     private static byte[] getSha256(byte[] bytes) throws NoSuchAlgorithmException {
         return MessageDigest.getInstance("SHA-256").digest(bytes);
+    }
+
+    public boolean isReadReceiptsEnabled() {
+        return readReceiptsEnabled;
+    }
+
+    public void setReadReceiptsEnabled(boolean readReceiptsEnabled) {
+        this.readReceiptsEnabled = readReceiptsEnabled;
     }
 
     private static byte[] newOtrKey() {
