@@ -49,12 +49,15 @@ public class FileAsset extends AssetBase {
         // Remote
         Messages.Asset.RemoteData.Builder remote = Messages.Asset.RemoteData.newBuilder()
                 .setOtrKey(ByteString.copyFrom(getOtrKey()))
-                .setSha256(ByteString.copyFrom(getSha256()))
-                .setAssetId(getAssetKey());
+                .setSha256(ByteString.copyFrom(getSha256()));
 
         // Only set token on private assets
         if (getAssetToken() != null) {
             remote.setAssetToken(getAssetToken());
+        }
+
+        if (getAssetKey() != null) {
+            remote.setAssetId(getAssetKey());
         }
 
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()

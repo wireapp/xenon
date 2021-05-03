@@ -75,12 +75,16 @@ public class Picture extends AssetBase {
                 .setImage(metaData);
 
         Messages.Asset.RemoteData.Builder remoteData = Messages.Asset.RemoteData.newBuilder()
-                .setAssetId(assetKey)
                 .setOtrKey(ByteString.copyFrom(getOtrKey()))
                 .setSha256(ByteString.copyFrom(getSha256()));
 
-        if (getAssetToken() != null)
+        if (getAssetToken() != null) {
             remoteData.setAssetToken(getAssetToken());
+        }
+
+        if (getAssetKey() != null) {
+            remoteData.setAssetId(getAssetKey());
+        }
 
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()
                 .setExpectsReadConfirmation(isReadReceiptsEnabled())
