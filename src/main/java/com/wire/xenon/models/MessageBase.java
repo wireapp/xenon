@@ -21,10 +21,11 @@ package com.wire.xenon.models;
 import java.util.UUID;
 
 public abstract class MessageBase {
+    protected final UUID messageId;
+    protected UUID eventId;
     protected final UUID userId;
     protected final String clientId;
     protected final UUID conversationId;
-    protected final UUID messageId;
     protected String time;
 
     MessageBase(UUID msgId, UUID convId, String clientId, UUID userId) {
@@ -56,5 +57,13 @@ public abstract class MessageBase {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public UUID getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(UUID eventId) {
+        this.eventId = eventId;
     }
 }

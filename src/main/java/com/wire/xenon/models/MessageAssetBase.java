@@ -23,15 +23,19 @@ import com.waz.model.Messages;
 import java.util.UUID;
 
 /**
+ *
  */
 public class MessageAssetBase extends MessageBase {
+    // Remote data
     private String assetKey;
     private String assetToken;
     private byte[] otrKey;
-    private String mimeType;
-    private long size;
     private byte[] sha256;
+
+    // Origin
+    private String mimeType;
     private String name;
+    private long size;
 
     public MessageAssetBase(UUID msgId, UUID convId, String clientId, UUID userId,
                             String assetKey, String assetToken, byte[] otrKey, String mimeType, long size,

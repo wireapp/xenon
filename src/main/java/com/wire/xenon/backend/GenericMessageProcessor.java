@@ -48,12 +48,14 @@ public class GenericMessageProcessor {
         originals.remove(messageId);
     }
 
-    public boolean process(UUID from, String clientId, UUID convId, String time, Messages.GenericMessage generic) {
+    public boolean process(UUID eventId, UUID from, String clientId, UUID convId, String time,
+                           Messages.GenericMessage generic) {
         UUID messageId = UUID.fromString(generic.getMessageId());
 
         Messages.Asset asset = null;
 
-        Logger.debug("msgId: %s hasText: %s, hasAsset: %s",
+        Logger.debug("eventId: %s, msgId: %s hasText: %s, hasAsset: %s",
+                eventId,
                 messageId,
                 generic.hasText(),
                 generic.hasAsset());
@@ -65,6 +67,7 @@ public class GenericMessageProcessor {
             if (ephemeral.hasText() && ephemeral.getText().hasContent()) {
                 EphemeralTextMessage msg = new EphemeralTextMessage(messageId, convId, clientId, from);
                 msg.setTime(time);
+                msg.setEventId(eventId);
                 msg.setExpireAfterMillis(ephemeral.getExpireAfterMillis());
                 msg.setText(ephemeral.getText().getContent());
                 if (ephemeral.getText().hasQuote()) {
@@ -90,6 +93,8 @@ public class GenericMessageProcessor {
             msg.setReplacingMessageId(UUID.fromString(edited.getReplacingMessageId()));
             msg.setText(edited.getText().getContent());
             msg.setTime(time);
+            msg.setEventId(eventId);
+
             for (Messages.Mention mention : edited.getText().getMentionsList())
                 msg.addMention(mention.getUserId(), mention.getStart(), mention.getLength());
 
@@ -100,6 +105,7 @@ public class GenericMessageProcessor {
         if (generic.hasConfirmation()) {
             Messages.Confirmation confirmation = generic.getConfirmation();
             ConfirmationMessage msg = new ConfirmationMessage(messageId, convId, clientId, from);
+            msg.setEventId(eventId);
 
             return handleConfirmation(confirmation, msg, time);
         }
@@ -111,6 +117,7 @@ public class GenericMessageProcessor {
 
             if (!linkPreviewList.isEmpty()) {
                 LinkPreviewMessage msg = new LinkPreviewMessage(messageId, convId, clientId, from);
+                msg.setEventId(eventId);
                 String content = text.getContent();
 
                 return handleLinkPreview(linkPreviewList, content, msg, time);
@@ -120,6 +127,8 @@ public class GenericMessageProcessor {
                 TextMessage msg = new TextMessage(messageId, convId, clientId, from);
                 msg.setText(text.getContent());
                 msg.setTime(time);
+                msg.setEventId(eventId);
+
                 if (text.hasQuote()) {
                     final String quotedMessageId = text.getQuote().getQuotedMessageId();
                     msg.setQuotedMessageId(UUID.fromString(quotedMessageId));
@@ -138,6 +147,8 @@ public class GenericMessageProcessor {
                 CallingMessage message = new CallingMessage(messageId, convId, clientId, from);
                 message.setContent(calling.getContent());
                 message.setTime(time);
+                message.setEventId(eventId);
+
                 handler.onCalling(client, message);
             }
             return true;
@@ -148,6 +159,7 @@ public class GenericMessageProcessor {
             UUID delMsgId = UUID.fromString(generic.getDeleted().getMessageId());
             msg.setDeletedMessageId(delMsgId);
             msg.setTime(time);
+            msg.setEventId(eventId);
 
             handler.onDelete(client, msg);
             return true;
@@ -156,12 +168,14 @@ public class GenericMessageProcessor {
         if (generic.hasReaction()) {
             Messages.Reaction reaction = generic.getReaction();
             ReactionMessage msg = new ReactionMessage(messageId, convId, clientId, from);
+            msg.setEventId(eventId);
 
             return handleReaction(reaction, msg, time);
         }
 
         if (generic.hasKnock()) {
             PingMessage msg = new PingMessage(messageId, convId, clientId, from);
+            msg.setEventId(eventId);
             msg.setTime(time);
 
             handler.onPing(client, msg);
@@ -174,7 +188,8 @@ public class GenericMessageProcessor {
         }
 
         if (asset != null) {
-            Logger.debug("Asset: msgId: %s hasOriginal: %s, hasUploaded: %s, hasPreview: %s",
+            Logger.debug("eventId: %s, msgId: %s hasOriginal: %s, hasUploaded: %s, hasPreview: %s",
+                    eventId,
                     messageId,
                     asset.hasOriginal(),
                     asset.hasUploaded(),
@@ -182,9 +197,12 @@ public class GenericMessageProcessor {
 
             if (asset.hasPreview()) {
                 ImageMessage msg = new ImageMessage(messageId, convId, clientId, from);
-                handleVideoPreview(asset.getPreview(), msg, time);
+                msg.setEventId(eventId);
+
+                handleVideoPreview(asset.getPreview(), msg, time);  //todo is this legacy?
             }
 
+            /// --- Obsolete ---
             if (asset.hasUploaded()) {
                 remotes.put(messageId, asset.getUploaded());
             }
@@ -200,7 +218,89 @@ public class GenericMessageProcessor {
             base.setTime(time);
             base.fromOrigin(original);
             base.fromRemote(remoteData);
+            /// --- Obsolete ---
 
+            if (asset.hasOriginal()) {
+                original = asset.getOriginal();
+                if (original.hasImage()) {
+                    final PhotoPreviewMessage message = new PhotoPreviewMessage(
+                            messageId,
+                            convId,
+                            clientId,
+                            from,
+                            original.getMimeType(),
+                            original.getSize(),
+                            original.getName(),
+                            original.getImage().getWidth(),
+                            original.getImage().getHeight());
+                    message.setEventId(eventId);
+                    message.setTime(time);
+
+                    handler.onPhotoPreview(client, message);
+                } else if (original.hasAudio()) {
+                    final AudioPreviewMessage message = new AudioPreviewMessage(
+                            messageId,
+                            convId,
+                            clientId,
+                            from,
+                            original.getMimeType(),
+                            original.getSize(),
+                            original.getName(),
+                            original.getAudio().getDurationInMillis(),
+                            original.getAudio().getNormalizedLoudness().toByteArray());
+                    message.setEventId(eventId);
+                    message.setTime(time);
+
+                    handler.onAudioPreview(client, message);
+                } else if (original.hasVideo()) {
+                    final VideoPreviewMessage message = new VideoPreviewMessage(
+                            messageId,
+                            convId,
+                            clientId,
+                            from,
+                            original.getMimeType(),
+                            original.getSize(),
+                            original.getName(),
+                            original.getVideo().getWidth(),
+                            original.getVideo().getHeight(),
+                            original.getVideo().getDurationInMillis());
+                    message.setEventId(eventId);
+                    message.setTime(time);
+
+                    handler.onVideoPreview(client, message);
+                } else {
+                    final FilePreviewMessage message = new FilePreviewMessage(
+                            messageId,
+                            convId,
+                            clientId,
+                            from,
+                            original.getMimeType(),
+                            original.getSize(),
+                            original.hasName() ? original.getName() : null);
+                    message.setEventId(eventId);
+                    message.setTime(time);
+
+                    handler.onFilePreview(client, message);
+                }
+            }
+
+            if (asset.hasUploaded()) {
+                final Messages.Asset.RemoteData uploaded = asset.getUploaded();
+                final RemoteMessage message = new RemoteMessage(messageId,
+                        convId,
+                        clientId,
+                        from,
+                        uploaded.getAssetId(),
+                        uploaded.getAssetToken(),
+                        uploaded.getOtrKey().toByteArray(),
+                        uploaded.getSha256().toByteArray());
+                message.setEventId(eventId);
+                message.setTime(time);
+
+                handler.onAssetData(client, message);
+            }
+
+            /// --- Obsolete ---
             if (base.getAssetKey() != null) {
                 if (original != null) {
                     if (original.hasImage()) {
@@ -222,6 +322,7 @@ public class GenericMessageProcessor {
                     return true;
                 }
             }
+            /// --- Obsolete ---
         }
 
         return false;

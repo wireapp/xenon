@@ -35,7 +35,8 @@ public abstract class MessageResourceBase {
 
                 Messages.GenericMessage message = decrypt(client, payload);
 
-                boolean process = processor.process(from,
+                boolean process = processor.process(eventId,
+                        from,
                         data.sender,
                         payload.convId,
                         payload.time,
@@ -139,9 +140,9 @@ public abstract class MessageResourceBase {
         }
     }
 
-    private SystemMessage getSystemMessage(UUID messageId, Payload payload) {
+    private SystemMessage getSystemMessage(UUID eventId, Payload payload) {
         SystemMessage systemMessage = new SystemMessage();
-        systemMessage.id = messageId;
+        systemMessage.id = eventId;
         systemMessage.from = payload.from;
         systemMessage.time = payload.time;
         systemMessage.type = payload.type;
