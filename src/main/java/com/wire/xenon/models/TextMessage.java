@@ -39,7 +39,7 @@ public class TextMessage extends MessageBase {
     private byte[] quotedMessageSha256;
 
     @JsonProperty
-    private ArrayList<Mention> mentions;
+    private final ArrayList<Mention> mentions = new ArrayList<>();
 
     @JsonCreator
     public TextMessage(@JsonProperty("eventId") UUID eventId,
@@ -80,9 +80,6 @@ public class TextMessage extends MessageBase {
     }
 
     public void addMention(String userId, int offset, int len) {
-        if (mentions == null)
-            mentions = new ArrayList<>();
-
         Mention mention = new Mention();
         mention.userId = UUID.fromString(userId);
         mention.offset = offset;
