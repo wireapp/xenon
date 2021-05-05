@@ -18,8 +18,6 @@
 
 package com.wire.xenon.models;
 
-import com.waz.model.Messages;
-
 import java.util.UUID;
 
 public abstract class OriginMessage extends MessageBase {
@@ -27,8 +25,12 @@ public abstract class OriginMessage extends MessageBase {
     private String name;
     private long size;
 
-    public OriginMessage(UUID msgId, UUID convId, String clientId, UUID userId) {
-        super(msgId, convId, clientId, userId);
+    public OriginMessage(UUID eventId, UUID msgId, UUID convId, String clientId, UUID userId, String time) {
+        super(eventId, msgId, convId, clientId, userId, time);
+    }
+
+    public OriginMessage(MessageBase msg) {
+        super(msg);
     }
 
     public long getSize() {
@@ -53,11 +55,5 @@ public abstract class OriginMessage extends MessageBase {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void fromOrigin(Messages.Asset.Original original) {
-        setMimeType(original.getMimeType());
-        setSize(original.getSize());
-        setName(original.hasName() ? original.getName() : null);
     }
 }

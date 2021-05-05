@@ -21,6 +21,7 @@ package com.wire.xenon.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.waz.model.Messages;
 
 import java.util.UUID;
 
@@ -33,16 +34,18 @@ public class AudioPreviewMessage extends OriginMessage {
     private byte[] levels;
 
     @JsonCreator
-    public AudioPreviewMessage(@JsonProperty("messageId") UUID messageId,
+    public AudioPreviewMessage(@JsonProperty("eventId") UUID eventId,
+                               @JsonProperty("messageId") UUID messageId,
                                @JsonProperty("conversationId") UUID convId,
                                @JsonProperty("clientId") String clientId,
                                @JsonProperty("userId") UUID userId,
+                               @JsonProperty("time") String time,
                                @JsonProperty("mimeType") String mimeType,
                                @JsonProperty("size") long size,
                                @JsonProperty("name") String name,
                                @JsonProperty("duration") long duration,
                                @JsonProperty("levels") byte[] levels) {
-        super(messageId, convId, clientId, userId);
+        super(eventId, messageId, convId, clientId, userId, time);
 
         setMimeType(mimeType);
         setName(name);
@@ -50,6 +53,16 @@ public class AudioPreviewMessage extends OriginMessage {
 
         setDuration(duration);
         setLevels(levels);
+    }
+
+    public AudioPreviewMessage(MessageBase msg, Messages.Asset.Original original) {
+        super(msg);
+
+        setMimeType(original.getMimeType());
+        setSize(original.getSize());
+        setName(original.getName());
+        setDuration(original.getAudio().getDurationInMillis());
+        setLevels(original.getAudio().getNormalizedLoudness().toByteArray());
     }
 
     public long getDuration() {

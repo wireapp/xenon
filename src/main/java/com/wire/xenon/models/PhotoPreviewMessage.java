@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.waz.model.Messages;
 
 import java.util.UUID;
 
@@ -34,16 +35,18 @@ public class PhotoPreviewMessage extends OriginMessage {
     private int width;
 
     @JsonCreator
-    public PhotoPreviewMessage(@JsonProperty("messageId") UUID messageId,
+    public PhotoPreviewMessage(@JsonProperty("eventId") UUID eventId,
+                               @JsonProperty("messageId") UUID messageId,
                                @JsonProperty("conversationId") UUID convId,
                                @JsonProperty("clientId") String clientId,
                                @JsonProperty("userId") UUID userId,
+                               @JsonProperty("time") String time,
                                @JsonProperty("mimeType") String mimeType,
                                @JsonProperty("size") long size,
                                @JsonProperty("name") String name,
                                @JsonProperty("width") int width,
                                @JsonProperty("height") int height) {
-        super(messageId, convId, clientId, userId);
+        super(eventId, messageId, convId, clientId, userId, time);
 
         setMimeType(mimeType);
         setName(name);
@@ -53,8 +56,15 @@ public class PhotoPreviewMessage extends OriginMessage {
         setHeight(height);
     }
 
-    public PhotoPreviewMessage(UUID msgId, UUID convId, String clientId, UUID userId) {
-        super(msgId, convId, clientId, userId);
+    public PhotoPreviewMessage(MessageBase msg, Messages.Asset.Original original) {
+        super(msg);
+
+        setMimeType(original.getMimeType());
+        setSize(original.getSize());
+        setName(original.getName());
+
+        setWidth(original.getImage().getWidth());
+        setHeight(original.getImage().getHeight());
     }
 
     public int getHeight() {

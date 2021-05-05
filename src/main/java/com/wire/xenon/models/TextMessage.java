@@ -39,14 +39,20 @@ public class TextMessage extends MessageBase {
     private byte[] quotedMessageSha256;
 
     @JsonProperty
-    private ArrayList<Mention> mentions = new ArrayList<>();
+    private ArrayList<Mention> mentions;
 
     @JsonCreator
-    public TextMessage(@JsonProperty("messageId") UUID messageId,
+    public TextMessage(@JsonProperty("eventId") UUID eventId,
+                       @JsonProperty("messageId") UUID messageId,
                        @JsonProperty("conversationId") UUID convId,
                        @JsonProperty("clientId") String clientId,
-                       @JsonProperty("userId") UUID userId) {
-        super(messageId, convId, clientId, userId);
+                       @JsonProperty("userId") UUID userId,
+                       @JsonProperty("time") String time) {
+        super(eventId, messageId, convId, clientId, userId, time);
+    }
+
+    public TextMessage(MessageBase msg) {
+        super(msg);
     }
 
     public String getText() {
@@ -74,6 +80,9 @@ public class TextMessage extends MessageBase {
     }
 
     public void addMention(String userId, int offset, int len) {
+        if (mentions == null)
+            mentions = new ArrayList<>();
+
         Mention mention = new Mention();
         mention.userId = UUID.fromString(userId);
         mention.offset = offset;

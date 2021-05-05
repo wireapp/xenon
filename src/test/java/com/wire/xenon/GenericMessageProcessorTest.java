@@ -5,6 +5,7 @@ import com.waz.model.Messages;
 import com.wire.xenon.backend.GenericMessageProcessor;
 import com.wire.xenon.models.AudioMessage;
 import com.wire.xenon.models.LinkPreviewMessage;
+import com.wire.xenon.models.MessageBase;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -74,7 +75,8 @@ public class GenericMessageProcessorTest {
                 .setMessageId(messageId.toString())
                 .setText(text);
 
-        processor.process(eventId, from, sender, convId, time, builder.build());
+        MessageBase msgBase = new MessageBase(eventId, messageId, convId, sender, from, time);
+        processor.process(msgBase, builder.build());
     }
 
     @Test
@@ -108,7 +110,8 @@ public class GenericMessageProcessorTest {
                 .setMessageId(messageId.toString())
                 .setAsset(asset);
 
-        processor.process(eventId, from, sender, convId, time, builder.build());
+        MessageBase msgBase = new MessageBase(eventId, messageId, convId, sender, from, time);
+        processor.process(msgBase, builder.build());
     }
 
     @Test
@@ -138,7 +141,8 @@ public class GenericMessageProcessorTest {
                 .setMessageId(messageId.toString())
                 .setAsset(asset);
 
-        processor.process(eventId, from, sender, convId, time, builder.build());
+        MessageBase msgBase = new MessageBase(eventId, messageId, convId, sender, from, time);
+        processor.process(msgBase, builder.build());
     }
 
     private static class MessageHandler extends MessageHandlerBase {

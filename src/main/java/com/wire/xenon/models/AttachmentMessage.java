@@ -25,13 +25,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Deprecated
 public class AttachmentMessage extends MessageAssetBase {
     @JsonCreator
-    public AttachmentMessage(@JsonProperty("messageId") UUID messageId,
+    public AttachmentMessage(@JsonProperty("eventId") UUID eventId,
+                             @JsonProperty("messageId") UUID messageId,
                              @JsonProperty("conversationId") UUID convId,
                              @JsonProperty("clientId") String clientId,
-                             @JsonProperty("userId") UUID userId) {
-        super(messageId, convId, clientId, userId);
+                             @JsonProperty("userId") UUID userId,
+                             @JsonProperty("time") String time) {
+        super(eventId, messageId, convId, clientId, userId, time);
     }
 
     public AttachmentMessage(MessageAssetBase base) {

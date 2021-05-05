@@ -20,6 +20,7 @@ package com.wire.xenon.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.waz.model.Messages;
 
 import java.util.UUID;
 
@@ -34,20 +35,31 @@ public class RemoteMessage extends MessageBase {
     private byte[] sha256;
 
     @JsonCreator
-    public RemoteMessage(@JsonProperty("messageId") UUID messageId,
+    public RemoteMessage(@JsonProperty("eventId") UUID eventId,
+                         @JsonProperty("messageId") UUID messageId,
                          @JsonProperty("conversationId") UUID convId,
                          @JsonProperty("clientId") String clientId,
                          @JsonProperty("userId") UUID userId,
+                         @JsonProperty("time") String time,
                          @JsonProperty("assetId") String assetId,
                          @JsonProperty("assetToken") String assetToken,
                          @JsonProperty("otrKey") byte[] otrKey,
                          @JsonProperty("sha256") byte[] sha256) {
-        super(messageId, convId, clientId, userId);
+        super(eventId, messageId, convId, clientId, userId, time);
 
         setAssetId(assetId);
         setAssetToken(assetToken);
         setSha256(sha256);
         setOtrKey(otrKey);
+    }
+
+    public RemoteMessage(MessageBase msg, Messages.Asset.RemoteData uploaded) {
+        super(msg);
+
+        setAssetId(uploaded.getAssetId());
+        setAssetToken(uploaded.getAssetToken());
+        setSha256(uploaded.getSha256().toByteArray());
+        setOtrKey(uploaded.getOtrKey().toByteArray());
     }
 
     public String getAssetToken() {

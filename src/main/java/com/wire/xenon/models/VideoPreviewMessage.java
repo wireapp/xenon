@@ -21,6 +21,7 @@ package com.wire.xenon.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.waz.model.Messages;
 
 import java.util.UUID;
 
@@ -34,17 +35,20 @@ public class VideoPreviewMessage extends OriginMessage {
     private int height;
 
     @JsonCreator
-    public VideoPreviewMessage(@JsonProperty("messageId") UUID messageId,
-                               @JsonProperty("conversationId") UUID convId,
-                               @JsonProperty("clientId") String clientId,
-                               @JsonProperty("userId") UUID userId,
-                               @JsonProperty("mimeType") String mimeType,
-                               @JsonProperty("size") long size,
-                               @JsonProperty("name") String name,
-                               @JsonProperty("width") int width,
-                               @JsonProperty("height") int height,
-                               @JsonProperty("duration") long duration) {
-        super(messageId, convId, clientId, userId);
+    public VideoPreviewMessage(
+            @JsonProperty("eventId") UUID eventId,
+            @JsonProperty("messageId") UUID messageId,
+            @JsonProperty("conversationId") UUID convId,
+            @JsonProperty("clientId") String clientId,
+            @JsonProperty("userId") UUID userId,
+            @JsonProperty("time") String time,
+            @JsonProperty("mimeType") String mimeType,
+            @JsonProperty("size") long size,
+            @JsonProperty("name") String name,
+            @JsonProperty("width") int width,
+            @JsonProperty("height") int height,
+            @JsonProperty("duration") long duration) {
+        super(eventId, messageId, convId, clientId, userId, time);
 
         setMimeType(mimeType);
         setName(name);
@@ -53,6 +57,18 @@ public class VideoPreviewMessage extends OriginMessage {
         setWidth(width);
         setHeight(height);
         setDuration(duration);
+    }
+
+    public VideoPreviewMessage(MessageBase msg, Messages.Asset.Original original) {
+        super(msg);
+
+        setMimeType(original.getMimeType());
+        setSize(original.getSize());
+        setName(original.getName());
+
+        setWidth(original.getVideo().getWidth());
+        setHeight(original.getVideo().getHeight());
+        setDuration(original.getVideo().getDurationInMillis());
     }
 
     public long getDuration() {

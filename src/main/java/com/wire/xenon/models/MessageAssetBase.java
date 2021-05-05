@@ -22,9 +22,7 @@ import com.waz.model.Messages;
 
 import java.util.UUID;
 
-/**
- *
- */
+@Deprecated
 public class MessageAssetBase extends MessageBase {
     // Remote data
     private String assetKey;
@@ -37,10 +35,20 @@ public class MessageAssetBase extends MessageBase {
     private String name;
     private long size;
 
-    public MessageAssetBase(UUID msgId, UUID convId, String clientId, UUID userId,
-                            String assetKey, String assetToken, byte[] otrKey, String mimeType, long size,
-                            byte[] sha256, String name) {
-        super(msgId, convId, clientId, userId);
+    public MessageAssetBase(UUID eventId,
+                            UUID msgId,
+                            UUID convId,
+                            String clientId,
+                            UUID userId,
+                            String time,
+                            String assetKey,
+                            String assetToken,
+                            byte[] otrKey,
+                            String mimeType,
+                            long size,
+                            byte[] sha256,
+                            String name) {
+        super(eventId, msgId, convId, clientId, userId, time);
         this.assetKey = assetKey;
         this.assetToken = assetToken;
         this.otrKey = otrKey;
@@ -50,12 +58,12 @@ public class MessageAssetBase extends MessageBase {
         this.name = name;
     }
 
-    public MessageAssetBase(UUID msgId, UUID convId, String clientId, UUID userId) {
-        super(msgId, convId, clientId, userId);
+    public MessageAssetBase(UUID eventID, UUID msgId, UUID convId, String clientId, UUID userId, String time) {
+        super(eventID, msgId, convId, clientId, userId, time);
     }
 
     MessageAssetBase(MessageAssetBase base) {
-        super(base.messageId, base.conversationId, base.clientId, base.userId);
+        super(base.eventId, base.messageId, base.conversationId, base.clientId, base.userId, base.time);
         assetKey = base.assetKey;
         assetToken = base.assetToken;
         otrKey = base.otrKey;
@@ -63,7 +71,10 @@ public class MessageAssetBase extends MessageBase {
         size = base.size;
         sha256 = base.sha256;
         name = base.name;
-        time = base.time;
+    }
+
+    public MessageAssetBase(MessageBase msg) {
+        super(msg);
     }
 
     public void setSize(long size) {
