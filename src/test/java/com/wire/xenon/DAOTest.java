@@ -6,12 +6,14 @@ import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.UUID;
 
+@Disabled("Integration test with the database, run manually.")
 public class DAOTest {
     private static final String url = "jdbc:postgresql://localhost/xenon";
     private static final Jdbi jdbi = Jdbi.create(url)
