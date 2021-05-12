@@ -24,7 +24,7 @@ jobs:
         uses: 8398a7/action-slack@v2
         with:
           status: ${{ job.status }}
-          author_name: Test execution before release
+          author_name: Xenon - test execution before release
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.WEBHOOK_CI }}
         if: failure()
@@ -66,8 +66,8 @@ jobs:
         uses: 8398a7/action-slack@v2
         with:
           status: ${{ job.status }}
-          author_name: Release to Maven Central
+          author_name: Xenon - Release to Maven Central
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WEBHOOK_CI }}
+          SLACK_WEBHOOK_URL: ${{ secrets.WEBHOOK_RELEASE }}
         # Send message only if previous step failed
         if: always()
