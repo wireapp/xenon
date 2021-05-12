@@ -9,8 +9,20 @@ jobs:
   tests:
     runs-on: ubuntu-20.04
     container: wirebot/cryptobox:latest
+    # enable postgres
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
     steps:
       - uses: actions/checkout@v2
+
+      - name: Setup Environment Variables
+        run: |
+          echo "POSTGRES_USER=postgres" >> $GITHUB_ENV
+          echo "POSTGRES_PASSWORD=postgres" >> $GITHUB_ENV
+          echo "POSTGRES_URL=postgres:5432/postgres" >> $GITHUB_ENV
 
       - name: Execute Tests
         run: |
@@ -39,7 +51,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 11
 
       - name: Build with Maven
         run: mvn -DskipTests package
@@ -47,7 +59,7 @@ jobs:
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v1
         with: # running setup-java again overwrites the settings.xml
-          java-version: 1.8
+          java-version: 11
           server-id: ossrh
           server-username: OSSRH_USERNAME
           server-password: OSSRH_PASSWORD
