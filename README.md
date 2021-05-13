@@ -11,7 +11,7 @@ Wire Bots base library
     <dependency>
         <groupId>com.wire</groupId>
         <artifactId>xenon</artifactId>
-        <version>1.3.1</version>
+        <version>1.3.2</version>
     </dependency>
 <dependencies>
 ```
