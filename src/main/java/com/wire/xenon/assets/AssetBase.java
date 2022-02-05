@@ -16,7 +16,7 @@ public abstract class AssetBase implements IAsset, IGeneric {
     protected String assetKey;
     protected String assetToken;
     protected byte[] sha256;
-
+    protected boolean isPublic = false;
     protected String retention = "persistent";
     protected boolean readReceiptsEnabled = true;
 
@@ -36,7 +36,6 @@ public abstract class AssetBase implements IAsset, IGeneric {
 
         encBytes = Util.encrypt(otrKey, bytes, iv);
         sha256 = MessageDigest.getInstance("SHA-256").digest(encBytes);
-
     }
 
     @Override
@@ -60,7 +59,11 @@ public abstract class AssetBase implements IAsset, IGeneric {
 
     @Override
     public boolean isPublic() {
-        return false;
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 
     @Override
