@@ -58,7 +58,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
         <jdbi.version>3.32.0</jdbi.version>
         <protobuf.version>3.21.1</protobuf.version>
         <junit.version>5.9.0</junit.version>
