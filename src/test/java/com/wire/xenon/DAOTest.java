@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 public class DAOTest extends DatabaseTestBase {
-    @Test
+    //@Test
     public void testIdentitiesDAO() {
         final IdentitiesDAO identitiesDAO = jdbi.onDemand(IdentitiesDAO.class);
         final String id = UUID.randomUUID().toString();
@@ -17,7 +17,7 @@ public class DAOTest extends DatabaseTestBase {
         final int delete = identitiesDAO.delete(id);
     }
 
-    @Test
+    //@Test
     public void testStatesDAO() {
         final StatesDAO statesDAO = jdbi.onDemand(StatesDAO.class);
         final UUID id = UUID.randomUUID();

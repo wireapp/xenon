@@ -19,10 +19,12 @@
 package com.wire.xenon.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetKey {
+    @JsonProperty("key")
     public String id;
     public String token;
-    public String expires;
+    public String domain;
 }
