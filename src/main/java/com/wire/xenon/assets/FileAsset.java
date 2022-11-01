@@ -64,6 +64,10 @@ public class FileAsset extends AssetBase {
             remote.setAssetId(getAssetKey());
         }
 
+        if (getDomain() != null) {
+            remote.setAssetDomain(getDomain());
+        }
+
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()
                 .setExpectsReadConfirmation(isReadReceiptsEnabled())
                 .setUploaded(remote);

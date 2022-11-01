@@ -19,6 +19,7 @@ public abstract class AssetBase implements IAsset, IGeneric {
     protected boolean isPublic = false;
     protected String retention = "persistent";
     protected boolean readReceiptsEnabled = true;
+    protected String domain;
 
     public AssetBase(UUID messageId, String mimeType) {
         this.messageId = messageId;
@@ -113,5 +114,13 @@ public abstract class AssetBase implements IAsset, IGeneric {
 
     public void setSha256(byte[] sha256) {
         this.sha256 = sha256;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 }
