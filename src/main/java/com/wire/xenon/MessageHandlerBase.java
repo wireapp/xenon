@@ -57,6 +57,14 @@ public abstract class MessageHandlerBase {
 
     }
 
+    public void onConversationRename(WireClient client, SystemMessage systemMessage) {
+
+    }
+
+    public void onConversationDelete(UUID botId, SystemMessage systemMessage) {
+
+    }
+
     /**
      * This callback is invoked by the framework every time connection request is received
      *
@@ -67,7 +75,7 @@ public abstract class MessageHandlerBase {
      * @return TRUE if connection was accepted
      */
     public boolean onConnectRequest(WireClient client, UUID from, UUID to, String status) {
-        // Bot received connect request and we want to accept it immediately
+        // Bot received connect request, and we want to accept it immediately
         if (status.equals("pending")) {
             try {
                 client.acceptConnection(to);
@@ -78,24 +86,21 @@ public abstract class MessageHandlerBase {
             }
         }
         // Connect request sent by the bot got accepted
-        if (status.equals("accepted")) {
-            return true;
-        }
-        return false;
+        return status.equals("accepted");
     }
 
     /**
      * This callback is invoked by the framework every time new participant joins this conversation
      *
      * @param client  Thread safe wire client that can be used to post back to this conversation
-     * @param message System message object with message.users as List of UserIds that just joined this conversation
+     * @param message System message object with `message.users` as List of UserIds that just joined this conversation
      */
     public void onMemberJoin(WireClient client, SystemMessage message) {
     }
 
     /**
      * @param client  Thread safe wire client that can be used to post back to this conversation
-     * @param message System message object with message.users as List of UserIds that just joined this conversation
+     * @param message System message object with `message.users` as List of UserIds that just joined this conversation
      */
     public void onMemberLeave(WireClient client, SystemMessage message) {
     }
@@ -103,14 +108,14 @@ public abstract class MessageHandlerBase {
     /**
      * This callback is called when this bot gets removed from the conversation
      *
-     * @param botId Id of the Bot that got removed
+     * @param botId Identifier of the Bot that got removed
      * @param msg   System message
      */
     public void onBotRemoved(UUID botId, SystemMessage msg) {
     }
 
     /**
-     * @param newBot
+     * @param newBot Initial State
      * @return Bot name that will be used for this conversation. If NULL is returned the Default Bot Name will be used
      */
     public String getName(NewBot newBot) {
@@ -172,10 +177,6 @@ public abstract class MessageHandlerBase {
 
     }
 
-    public void onConversationRename(WireClient client, SystemMessage systemMessage) {
-
-    }
-
     public void onDelete(WireClient client, DeletedTextMessage msg) {
 
     }
@@ -218,7 +219,7 @@ public abstract class MessageHandlerBase {
             int minAvailable = 8 * size;
             if (minAvailable > 0) {
                 ArrayList<Integer> availablePrekeys = client.getAvailablePrekeys();
-                availablePrekeys.remove(new Integer(65535));  //remove the last prekey
+                availablePrekeys.remove(Integer.valueOf(65535));  //remove the last prekey
                 if (!availablePrekeys.isEmpty() && availablePrekeys.size() < minAvailable) {
                     Integer lastKeyOffset = Collections.max(availablePrekeys);
                     ArrayList<PreKey> keys = client.newPreKeys(lastKeyOffset + 1, minAvailable);

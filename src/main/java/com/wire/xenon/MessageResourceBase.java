@@ -87,7 +87,7 @@ public abstract class MessageResourceBase {
                 systemMessage = getSystemMessage(eventId, payload);
 
                 // Cleanup
-                handler.onBotRemoved(botId, systemMessage);
+                handler.onConversationDelete(botId, systemMessage);
                 break;
             case "conversation.create":
                 Logger.debug("conversation.create: bot: %s", botId);
