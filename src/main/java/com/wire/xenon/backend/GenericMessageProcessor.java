@@ -142,6 +142,15 @@ public class GenericMessageProcessor {
             return handleAsset(msgBase, generic.getAsset());
         }
 
+        if (generic.hasButtonAction()) {
+            Messages.ButtonAction btn = generic.getButtonAction();
+            ButtonActionMessage msg = new ButtonActionMessage(msgBase);
+
+            msg.setButtonId(btn.getButtonId());
+            msg.setReference(UUID.fromString(btn.getReferenceMessageId()));
+
+            handler.onButtonClick(client, msg);
+        }
         return false;
     }
 

@@ -19,6 +19,7 @@
 package com.wire.xenon;
 
 import com.waz.model.Messages;
+import com.wire.xenon.assets.ButtonActionConfirmation;
 import com.wire.xenon.backend.models.NewBot;
 import com.wire.xenon.backend.models.SystemMessage;
 import com.wire.xenon.models.*;
@@ -250,5 +251,17 @@ public abstract class MessageHandlerBase {
 
     public void onVideoPreview(WireClient client, VideoPreviewMessage msg) {
 
+    }
+
+    public void onButtonClick(WireClient client, ButtonActionMessage msg) {
+        ButtonActionConfirmation confirmation = new ButtonActionConfirmation(
+                msg.getReference(),
+                msg.getButtonId());
+
+        try {
+            client.send(confirmation, msg.getUserId());
+        } catch (Exception e) {
+            Logger.exception(e, "onButtonClick: %s", client.getId());
+        }
     }
 }
