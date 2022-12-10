@@ -14,6 +14,5 @@ public class SystemMessage {
     public String time;
     public UUID from;
     public Conversation conversation;
-    public UUID convId;
     public List<UUID> users;
 }

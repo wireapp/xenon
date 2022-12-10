@@ -18,7 +18,6 @@
 
 package com.wire.xenon.backend.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -125,10 +124,12 @@ public class Payload {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Qualified {
-        @JsonCreator
-        public Qualified(@JsonProperty UUID id, @JsonProperty String domain) {
+        public Qualified(UUID id, String domain) {
             this.id = id;
             this.domain = domain;
+        }
+
+        public Qualified() {
         }
 
         @JsonProperty
