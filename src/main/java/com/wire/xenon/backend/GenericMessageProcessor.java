@@ -192,9 +192,7 @@ public class GenericMessageProcessor {
         Messages.Confirmation.Type type = confirmation.getType();
 
         msg.setConfirmationMessageId(UUID.fromString(firstMessageId));
-        msg.setType(type.getNumber() == Messages.Confirmation.Type.DELIVERED_VALUE
-                ? ConfirmationMessage.Type.DELIVERED
-                : ConfirmationMessage.Type.READ);
+        msg.setType(type.getNumber() == Messages.Confirmation.Type.DELIVERED_VALUE ? ConfirmationMessage.Type.DELIVERED : ConfirmationMessage.Type.READ);
 
         handler.onConfirmation(client, msg);
         return true;
@@ -202,22 +200,17 @@ public class GenericMessageProcessor {
 
     private boolean handleLinkPreview(Messages.Text text, LinkPreviewMessage msg) {
         for (Messages.LinkPreview link : text.getLinkPreviewList()) {
-
             if (text.hasContent()) {
-                Messages.Asset image = link.getImage();
-
-                msg.fromOrigin(image.getOriginal());
-                msg.fromRemote(image.getUploaded());
-
-                final Messages.Asset.ImageMetaData imageMetaData = image.getOriginal().getImage();
-                msg.setHeight(imageMetaData.getHeight());
-                msg.setWidth(imageMetaData.getWidth());
-
                 msg.setSummary(link.getSummary());
                 msg.setTitle(link.getTitle());
                 msg.setUrl(link.getUrl());
                 msg.setUrlOffset(link.getUrlOffset());
 
+                if (link.hasImage()) {
+                    Messages.Asset image = link.getImage();
+                    msg.setSize(image.getOriginal().getSize());
+                    msg.setMimeType(image.getOriginal().getMimeType());
+                }
                 msg.setText(text.getContent());
                 handler.onLinkPreview(client, msg);
             }

@@ -28,7 +28,7 @@ public abstract class MessageResourceBase {
 
         switch (payload.type) {
             case "conversation.otr-message-add":
-                UUID from = payload.from;
+                UUID from = payload.from.id;
 
                 Logger.debug("conversation.otr-message-add: bot: %s from: %s:%s", botId, from, data.sender);
 
@@ -37,7 +37,7 @@ public abstract class MessageResourceBase {
                 Messages.GenericMessage genericMessage = decrypt(client, payload);
 
                 final UUID messageId = UUID.fromString(genericMessage.getMessageId());
-                MessageBase msgBase = new MessageBase(eventId, messageId, payload.convId, data.sender, from, payload.time);
+                MessageBase msgBase = new MessageBase(eventId, messageId, payload.conversation.id, data.sender, from, payload.time);
 
                 processor.process(msgBase, genericMessage);
 
@@ -137,24 +137,26 @@ public abstract class MessageResourceBase {
     private SystemMessage getSystemMessage(UUID eventId, Payload payload) {
         SystemMessage systemMessage = new SystemMessage();
         systemMessage.id = eventId;
-        systemMessage.from = payload.from;
+        systemMessage.from = payload.from != null ? payload.from.id : null;
         systemMessage.time = payload.time;
         systemMessage.type = payload.type;
-        systemMessage.convId = payload.convId;
 
         systemMessage.conversation = new Conversation();
-        systemMessage.conversation.id = payload.convId;
-        systemMessage.conversation.creator = payload.data.creator;
-        systemMessage.conversation.name = payload.data.name;
-        if (payload.data.members != null)
-            systemMessage.conversation.members = payload.data.members.others;
+        systemMessage.conversation.id = payload.conversation != null ? payload.conversation.id : null;
+
+        if (payload.data != null) {
+            systemMessage.conversation.creator = payload.data.creator;
+            systemMessage.conversation.name = payload.data.name;
+            if (payload.data.members != null)
+                systemMessage.conversation.members = payload.data.members.others;
+        }
 
         return systemMessage;
     }
 
     private Messages.GenericMessage decrypt(WireClient client, Payload payload)
             throws CryptoException, InvalidProtocolBufferException {
-        UUID from = payload.from;
+        UUID from = payload.from.id;
         String sender = payload.data.sender;
         String cipher = payload.data.text;
 

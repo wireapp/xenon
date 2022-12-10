@@ -155,11 +155,8 @@ public class GenericMessageProcessorTest {
             assertEquals(URL, msg.getUrl());
             assertEquals(URL_OFFSET, msg.getUrlOffset());
             assertEquals(CONTENT, msg.getText());
-            assertEquals(WIDTH, msg.getWidth());
-            assertEquals(HEIGHT, msg.getHeight());
             assertEquals(SIZE, msg.getSize());
             assertEquals(MIME_TYPE, msg.getMimeType());
-            assertEquals(ASSET_TOKEN, msg.getAssetToken());
         }
 
         @Override

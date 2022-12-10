@@ -18,6 +18,7 @@
 
 package com.wire.xenon.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -30,17 +31,19 @@ public class Payload {
     @JsonProperty
     @NotNull
     public String type;
-    @JsonProperty("conversation")
-    public UUID convId;
+
+    @JsonProperty("qualified_conversation")
+    public Qualified conversation;
+
+    @JsonProperty("qualified_from")
+    public Qualified from;
+
     @JsonProperty
-    @NotNull
-    public UUID from;
-    @JsonProperty
-    @NotNull
     public String time;
+
     @JsonProperty
-    @NotNull
     public Data data;
+
     @JsonProperty
     public UUID team;
 
@@ -118,5 +121,22 @@ public class Payload {
     public static class Members {
         @JsonProperty
         public List<Member> others;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Qualified {
+        @JsonCreator
+        public Qualified(@JsonProperty UUID id, @JsonProperty String domain) {
+            this.id = id;
+            this.domain = domain;
+        }
+
+        @JsonProperty
+        @NotNull
+        public UUID id;
+
+        @JsonProperty
+        @NotNull
+        public String domain;
     }
 }

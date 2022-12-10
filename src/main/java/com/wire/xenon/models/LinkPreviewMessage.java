@@ -27,7 +27,7 @@ import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LinkPreviewMessage extends ImageMessage {
+public class LinkPreviewMessage extends OriginMessage {
     @JsonProperty
     private String summary;
     @JsonProperty
@@ -45,15 +45,8 @@ public class LinkPreviewMessage extends ImageMessage {
                               @JsonProperty("conversationId") UUID convId,
                               @JsonProperty("clientId") String clientId,
                               @JsonProperty("userId") UUID userId,
-                              @JsonProperty("time") String time,
-                              @JsonProperty("assetKey") String assetKey,
-                              @JsonProperty("assetToken") String assetToken,
-                              @JsonProperty("otrKey") byte[] otrKey,
-                              @JsonProperty("mimeType") String mimeType,
-                              @JsonProperty("size") long size,
-                              @JsonProperty("sha256") byte[] sha256,
-                              @JsonProperty("name") String name) {
-        super(eventId, messageId, convId, clientId, userId, time, assetKey, assetToken, otrKey, mimeType, size, sha256, name);
+                              @JsonProperty("time") String time) {
+        super(eventId, messageId, convId, clientId, userId, time);
     }
 
     public LinkPreviewMessage(MessageBase msg) {

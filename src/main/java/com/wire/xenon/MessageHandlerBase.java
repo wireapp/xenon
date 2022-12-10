@@ -194,10 +194,6 @@ public abstract class MessageHandlerBase {
 
     }
 
-    public void onLinkPreview(WireClient client, LinkPreviewMessage msg) {
-
-    }
-
     public void onPing(WireClient client, PingMessage msg) {
 
     }
@@ -250,6 +246,10 @@ public abstract class MessageHandlerBase {
     }
 
     public void onVideoPreview(WireClient client, VideoPreviewMessage msg) {
+
+    }
+
+    public void onLinkPreview(WireClient client, LinkPreviewMessage msg) {
 
     }
 
