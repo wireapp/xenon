@@ -29,51 +29,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-@Deprecated(since = "1.5.2", forRemoval = true)
-public class Picture extends AssetBase {
-    private byte[] imageData;
-    private int width;
-    private int height;
-    private int size;
+public class ImageAsset extends AssetBase {
+    private final byte[] imageData;
     private long expires;
 
-    public Picture(byte[] imageData, String mime) throws Exception {
-        super(UUID.randomUUID(), mime, imageData);
+    public ImageAsset(UUID messageId, byte[] imageData, String mime) throws Exception {
+        super(messageId, mime, imageData);
         this.imageData = imageData;
-        size = imageData.length;
-        BufferedImage bufferedImage = loadBufferImage(imageData);
-        width = bufferedImage.getWidth();
-        height = bufferedImage.getHeight();
     }
 
-    public Picture(byte[] imageData) throws Exception {
-        super(UUID.randomUUID(), Util.extractMimeType(imageData), imageData);
-
-        this.imageData = imageData;
-        size = imageData.length;
-        BufferedImage bufferedImage = loadBufferImage(imageData);
-        width = bufferedImage.getWidth();
-        height = bufferedImage.getHeight();
-    }
-
-    public Picture(UUID messageId, String mimeType) {
-        super(messageId, mimeType);
+    public ImageAsset(UUID messageId, byte[] imageData) throws Exception {
+        this(messageId, imageData, Util.extractMimeType(imageData));
     }
 
     @Override
     public Messages.GenericMessage createGenericMsg() {
         Messages.GenericMessage.Builder ret = Messages.GenericMessage.newBuilder()
                 .setMessageId(getMessageId().toString());
-
-        Messages.Asset.ImageMetaData.Builder metaData = Messages.Asset.ImageMetaData.newBuilder()
-                .setHeight(height)
-                .setWidth(width)
-                .setTag("medium");
-
-        Messages.Asset.Original.Builder original = Messages.Asset.Original.newBuilder()
-                .setSize(size)
-                .setMimeType(mimeType)
-                .setImage(metaData);
 
         Messages.Asset.RemoteData.Builder remoteData = Messages.Asset.RemoteData.newBuilder()
                 .setOtrKey(ByteString.copyFrom(getOtrKey()))
@@ -89,8 +61,7 @@ public class Picture extends AssetBase {
 
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()
                 .setExpectsReadConfirmation(isReadReceiptsEnabled())
-                .setUploaded(remoteData)
-                .setOriginal(original);
+                .setUploaded(remoteData);
 
         if (expires > 0) {
             Messages.Ephemeral.Builder ephemeral = Messages.Ephemeral.newBuilder()
@@ -106,32 +77,8 @@ public class Picture extends AssetBase {
                 .build();
     }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
     public byte[] getImageData() {
         return imageData;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
     }
 
     public long getExpires() {
@@ -142,9 +89,4 @@ public class Picture extends AssetBase {
         this.expires = expires;
     }
 
-    private BufferedImage loadBufferImage(byte[] imageData) throws IOException {
-        try (InputStream input = new ByteArrayInputStream(imageData)) {
-            return ImageIO.read(input);
-        }
-    }
 }

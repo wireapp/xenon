@@ -6,7 +6,7 @@
 
     <groupId>com.wire</groupId>
     <artifactId>xenon</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
 
     <name>Xenon</name>
     <description>Base Wire Bots Library</description>
@@ -68,12 +68,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.14.2</version>
+            <version>2.15.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.14.2</version>
+            <version>2.15.1</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -84,17 +84,17 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <!-- when updating this version, don't forget to update protocVersion in plugin -->
-            <version>3.21.9</version>
+            <version>3.22.2</version>
         </dependency>
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-core</artifactId>
-            <version>3.36.0</version>
+            <version>3.37.1</version>
         </dependency>
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-sqlobject</artifactId>
-            <version>3.37.0</version>
+            <version>3.37.1</version>
         </dependency>
 
         <!-- test dependencies -->
