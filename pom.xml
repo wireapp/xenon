@@ -84,7 +84,7 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <!-- when updating this version, don't forget to update protocVersion in plugin -->
-            <version>3.22.2</version>
+            <version>3.24.1</version>
         </dependency>
         <dependency>
             <groupId>org.jdbi</groupId>
