@@ -59,6 +59,10 @@ public class ImageAsset extends AssetBase {
             remoteData.setAssetId(getAssetKey());
         }
 
+        if (getDomain() != null) {
+            remoteData.setAssetDomain(getDomain());
+        }
+
         Messages.Asset.Builder asset = Messages.Asset.newBuilder()
                 .setExpectsReadConfirmation(isReadReceiptsEnabled())
                 .setUploaded(remoteData);
