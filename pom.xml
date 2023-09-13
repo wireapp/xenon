@@ -6,7 +6,7 @@
 
     <groupId>com.wire</groupId>
     <artifactId>xenon</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
 
     <name>Xenon</name>
     <description>Base Wire Bots Library</description>
@@ -83,18 +83,12 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <!-- when updating this version, don't forget to update protocVersion in plugin -->
             <version>3.24.3</version>
         </dependency>
         <dependency>
             <groupId>org.jdbi</groupId>
-            <artifactId>jdbi3-core</artifactId>
-            <version>3.37.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-sqlobject</artifactId>
-            <version>3.41.1</version>
+            <version>3.37.1</version>
         </dependency>
 
         <!-- test dependencies -->

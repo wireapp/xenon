@@ -61,7 +61,7 @@ jobs:
         uses: actions/setup-java@v3
         with: # running setup-java again overwrites the settings.xml
           distribution: 'temurin'
-          java-version: 17
+          java-version: 11
           server-id: ossrh
           server-username: OSSRH_USERNAME
           server-password: OSSRH_PASSWORD
