@@ -48,36 +48,6 @@ public class FileAsset extends AssetBase {
         this.otrKey = otrKey;
     }
 
-    @Override
-    public Messages.GenericMessage createGenericMsg() {
-        // Remote
-        Messages.Asset.RemoteData.Builder remote = Messages.Asset.RemoteData.newBuilder()
-                .setOtrKey(ByteString.copyFrom(getOtrKey()))
-                .setSha256(ByteString.copyFrom(getSha256()));
-
-        // Only set token on private assets
-        if (getAssetToken() != null) {
-            remote.setAssetToken(getAssetToken());
-        }
-
-        if (getAssetKey() != null) {
-            remote.setAssetId(getAssetKey());
-        }
-
-        if (getDomain() != null) {
-            remote.setAssetDomain(getDomain());
-        }
-
-        Messages.Asset.Builder asset = Messages.Asset.newBuilder()
-                .setExpectsReadConfirmation(isReadReceiptsEnabled())
-                .setUploaded(remote);
-
-        return Messages.GenericMessage.newBuilder()
-                .setMessageId(getMessageId().toString())
-                .setAsset(asset)
-                .build();
-    }
-
     private static byte[] readFile(File file) throws IOException {
         byte[] bytes;
         try (FileInputStream input = new FileInputStream(file)) {

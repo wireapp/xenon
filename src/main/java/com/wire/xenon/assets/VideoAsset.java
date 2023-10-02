@@ -25,33 +25,7 @@ import java.util.UUID;
 
 public class VideoAsset extends AssetBase {
 
-    public VideoAsset(byte[] bytes, String mime, UUID messageId) throws Exception {
-        super(messageId, mime, bytes);
-    }
-
-    @Override
-    public Messages.GenericMessage createGenericMsg() {
-        Messages.Asset.RemoteData.Builder remote = Messages.Asset.RemoteData.newBuilder()
-                .setOtrKey(ByteString.copyFrom(getOtrKey()))
-                .setSha256(ByteString.copyFrom(getSha256()));
-
-        // Only set token on private assets
-        if (getAssetToken() != null) {
-            remote.setAssetToken(getAssetToken());
-        }
-
-        if (getAssetKey() != null) {
-            remote.setAssetId(getAssetKey());
-        }
-
-        Messages.Asset asset = Messages.Asset.newBuilder()
-                .setUploaded(remote.build())
-                .setExpectsReadConfirmation(isReadReceiptsEnabled())
-                .build();
-
-        return Messages.GenericMessage.newBuilder()
-                .setMessageId(getMessageId().toString())
-                .setAsset(asset)
-                .build();
+    public VideoAsset(byte[] bytes, VideoPreview preview) throws Exception {
+        super(preview.getMessageId(), preview.getMimeType(), bytes);
     }
 }

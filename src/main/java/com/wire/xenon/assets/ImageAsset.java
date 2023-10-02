@@ -31,7 +31,6 @@ import java.util.UUID;
 
 public class ImageAsset extends AssetBase {
     private final byte[] imageData;
-    private long expires;
 
     public ImageAsset(UUID messageId, byte[] imageData, String mime) throws Exception {
         super(messageId, mime, imageData);
@@ -42,55 +41,7 @@ public class ImageAsset extends AssetBase {
         this(messageId, imageData, Util.extractMimeType(imageData));
     }
 
-    @Override
-    public Messages.GenericMessage createGenericMsg() {
-        Messages.GenericMessage.Builder ret = Messages.GenericMessage.newBuilder()
-                .setMessageId(getMessageId().toString());
-
-        Messages.Asset.RemoteData.Builder remoteData = Messages.Asset.RemoteData.newBuilder()
-                .setOtrKey(ByteString.copyFrom(getOtrKey()))
-                .setSha256(ByteString.copyFrom(getSha256()));
-
-        if (getAssetToken() != null) {
-            remoteData.setAssetToken(getAssetToken());
-        }
-
-        if (getAssetKey() != null) {
-            remoteData.setAssetId(getAssetKey());
-        }
-
-        if (getDomain() != null) {
-            remoteData.setAssetDomain(getDomain());
-        }
-
-        Messages.Asset.Builder asset = Messages.Asset.newBuilder()
-                .setExpectsReadConfirmation(isReadReceiptsEnabled())
-                .setUploaded(remoteData);
-
-        if (expires > 0) {
-            Messages.Ephemeral.Builder ephemeral = Messages.Ephemeral.newBuilder()
-                    .setAsset(asset)
-                    .setExpireAfterMillis(expires);
-
-            return ret
-                    .setEphemeral(ephemeral)
-                    .build();
-        }
-        return ret
-                .setAsset(asset)
-                .build();
-    }
-
     public byte[] getImageData() {
         return imageData;
     }
-
-    public long getExpires() {
-        return expires;
-    }
-
-    public void setExpires(long expires) {
-        this.expires = expires;
-    }
-
 }

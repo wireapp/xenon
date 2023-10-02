@@ -26,4 +26,8 @@ public interface IAsset {
     byte[] getEncryptedData();
 
     boolean isPublic();
+
+    long getExpires();
+
+    String getDomain();
 }

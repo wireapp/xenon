@@ -26,10 +26,10 @@ import java.util.UUID;
 public class LinkPreview implements IGeneric {
     private final String url;
     private final String title;
-    private final Picture thumbnail;
+    private final ImageAsset thumbnail;
     private final UUID messageId = UUID.randomUUID();
 
-    public LinkPreview(String url, String title, Picture thumbnail) {
+    public LinkPreview(String url, String title, ImageAsset thumbnail) {
         this.url = url;
         this.title = title;
         this.thumbnail = thumbnail;
