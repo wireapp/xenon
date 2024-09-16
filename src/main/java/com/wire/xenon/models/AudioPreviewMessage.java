@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.waz.model.Messages;
+import com.wire.xenon.backend.models.QualifiedId;
 
 import java.util.UUID;
 
@@ -36,9 +37,9 @@ public class AudioPreviewMessage extends OriginMessage {
     @JsonCreator
     public AudioPreviewMessage(@JsonProperty("eventId") UUID eventId,
                                @JsonProperty("messageId") UUID messageId,
-                               @JsonProperty("conversationId") UUID convId,
+                               @JsonProperty("conversationId") QualifiedId convId,
                                @JsonProperty("clientId") String clientId,
-                               @JsonProperty("userId") UUID userId,
+                               @JsonProperty("userId") QualifiedId userId,
                                @JsonProperty("time") String time,
                                @JsonProperty("mimeType") String mimeType,
                                @JsonProperty("size") long size,

@@ -21,6 +21,7 @@ package com.wire.xenon.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.waz.model.Messages;
+import com.wire.xenon.backend.models.QualifiedId;
 
 import java.util.UUID;
 
@@ -37,9 +38,9 @@ public class RemoteMessage extends MessageBase {
     @JsonCreator
     public RemoteMessage(@JsonProperty("eventId") UUID eventId,
                          @JsonProperty("messageId") UUID messageId,
-                         @JsonProperty("conversationId") UUID convId,
+                         @JsonProperty("conversationId") QualifiedId convId,
                          @JsonProperty("clientId") String clientId,
-                         @JsonProperty("userId") UUID userId,
+                         @JsonProperty("userId") QualifiedId userId,
                          @JsonProperty("time") String time,
                          @JsonProperty("assetId") String assetId,
                          @JsonProperty("assetToken") String assetToken,

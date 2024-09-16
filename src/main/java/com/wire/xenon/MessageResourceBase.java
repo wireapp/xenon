@@ -4,10 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.waz.model.Messages;
 import com.wire.bots.cryptobox.CryptoException;
 import com.wire.xenon.backend.GenericMessageProcessor;
-import com.wire.xenon.backend.models.Conversation;
-import com.wire.xenon.backend.models.Member;
-import com.wire.xenon.backend.models.Payload;
-import com.wire.xenon.backend.models.SystemMessage;
+import com.wire.xenon.backend.models.*;
 import com.wire.xenon.models.MessageBase;
 import com.wire.xenon.tools.Logger;
 
@@ -28,7 +25,7 @@ public abstract class MessageResourceBase {
 
         switch (payload.type) {
             case "conversation.otr-message-add":
-                UUID from = payload.from.id;
+                QualifiedId from = payload.from;
 
                 Logger.debug("conversation.otr-message-add: bot: %s from: %s:%s", botId, from, data.sender);
 
@@ -37,7 +34,7 @@ public abstract class MessageResourceBase {
                 Messages.GenericMessage genericMessage = decrypt(client, payload);
 
                 final UUID messageId = UUID.fromString(genericMessage.getMessageId());
-                MessageBase msgBase = new MessageBase(eventId, messageId, payload.conversation.id, data.sender, from, payload.time);
+                MessageBase msgBase = new MessageBase(eventId, messageId, payload.conversation, data.sender, from, payload.time);
 
                 processor.process(msgBase, genericMessage);
 
@@ -47,7 +44,7 @@ public abstract class MessageResourceBase {
                 Logger.debug("conversation.member-join: bot: %s", botId);
 
                 // Check if this bot got added to the conversation
-                List<UUID> participants = data.userIds;
+                List<QualifiedId> participants = data.userIds;
                 if (participants.remove(botId)) {
                     SystemMessage systemMessage = getSystemMessage(eventId, payload);
                     systemMessage.conversation = client.getConversation();
@@ -95,7 +92,7 @@ public abstract class MessageResourceBase {
                 systemMessage = getSystemMessage(eventId, payload);
                 if (systemMessage.conversation.members != null) {
                     Member self = new Member();
-                    self.id = botId;
+                    self.id = new QualifiedId(botId, null);
                     systemMessage.conversation.members.add(self);
                 }
 
@@ -119,7 +116,7 @@ public abstract class MessageResourceBase {
                 boolean accepted = handler.onConnectRequest(client, connection.from, connection.to, connection.status);
                 if (accepted) {
                     Conversation conversation = new Conversation();
-                    conversation.id = connection.convId;
+                    conversation.id = connection.conversation;
                     systemMessage = new SystemMessage();
                     systemMessage.id = eventId;
                     systemMessage.from = connection.from;
@@ -137,12 +134,12 @@ public abstract class MessageResourceBase {
     private SystemMessage getSystemMessage(UUID eventId, Payload payload) {
         SystemMessage systemMessage = new SystemMessage();
         systemMessage.id = eventId;
-        systemMessage.from = payload.from != null ? payload.from.id : null;
+        systemMessage.from = payload.from;
         systemMessage.time = payload.time;
         systemMessage.type = payload.type;
 
         systemMessage.conversation = new Conversation();
-        systemMessage.conversation.id = payload.conversation != null ? payload.conversation.id : null;
+        systemMessage.conversation.id = payload.conversation;
 
         if (payload.data != null) {
             systemMessage.conversation.creator = payload.data.creator;
@@ -156,7 +153,7 @@ public abstract class MessageResourceBase {
 
     private Messages.GenericMessage decrypt(WireClient client, Payload payload)
             throws CryptoException, InvalidProtocolBufferException {
-        UUID from = payload.from.id;
+        QualifiedId from = payload.from;
         String sender = payload.data.sender;
         String cipher = payload.data.text;
 

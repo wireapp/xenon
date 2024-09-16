@@ -22,9 +22,9 @@ import com.wire.bots.cryptobox.CryptoDb;
 import com.wire.bots.cryptobox.CryptoException;
 import com.wire.bots.cryptobox.ICryptobox;
 import com.wire.bots.cryptobox.IStorage;
+import com.wire.xenon.backend.models.QualifiedId;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * Wrapper for the Crypto Box. This class is thread safe.
@@ -40,20 +40,20 @@ public class CryptoDatabase extends CryptoBase {
      * Note: Do not create multiple OtrManagers that operate on the same or
      * overlapping directories. Doing so results in undefined behaviour.
      *
-     * @param botId   Bot id
+     * @param userId User id
      * @param storage Instance of a IStorage class
      */
-    public CryptoDatabase(UUID botId, IStorage storage) throws CryptoException {
+    public CryptoDatabase(QualifiedId userId, IStorage storage) throws CryptoException {
         try {
-            box = new CryptoDb(botId.toString(), storage);
+            box = new CryptoDb(userId.toString(), storage);
         } catch (IOException e) {
             throw new CryptoException(e);
         }
     }
 
-    public CryptoDatabase(UUID botId, IStorage storage, String dir) throws CryptoException {
+    public CryptoDatabase(QualifiedId userId, IStorage storage, String dir) throws CryptoException {
         try {
-            box = new CryptoDb(botId.toString(), storage, dir);
+            box = new CryptoDb(userId.toString(), storage, dir);
         } catch (IOException e) {
             throw new CryptoException(e);
         }

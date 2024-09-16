@@ -5,6 +5,7 @@ import com.wire.xenon.assets.IAsset;
 import com.wire.xenon.assets.IGeneric;
 import com.wire.xenon.backend.models.Conversation;
 import com.wire.xenon.backend.models.NewBot;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.User;
 import com.wire.xenon.crypto.Crypto;
 import com.wire.xenon.exceptions.HttpException;
@@ -17,11 +18,12 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.*;
 
-public abstract class WireClientBase implements WireClient {
+public class WireClientBase implements WireClient {
     protected final WireAPI api;
     protected final Crypto crypto;
     protected final NewBot state;
     protected Devices devices = null;
+    private String apiServerDomain;
 
     protected WireClientBase(WireAPI api, Crypto crypto, NewBot state) {
         this.api = api;
@@ -35,7 +37,7 @@ public abstract class WireClientBase implements WireClient {
     }
 
     @Override
-    public void send(IGeneric message, UUID userId) throws Exception {
+    public void send(IGeneric message, QualifiedId userId) throws Exception {
         postGenericMessage(message, userId);
     }
 
@@ -50,7 +52,7 @@ public abstract class WireClientBase implements WireClient {
     }
 
     @Override
-    public UUID getConversationId() {
+    public QualifiedId getConversationId() {
         return state.conversation.id;
     }
 
@@ -102,11 +104,11 @@ public abstract class WireClientBase implements WireClient {
         }
     }
 
-    protected void postGenericMessage(IGeneric generic, UUID userId) throws Exception {
+    protected void postGenericMessage(IGeneric generic, QualifiedId userId) throws Exception {
         // Try to encrypt the msg for those devices that we have the session already
         Missing all = getAllDevices();
         Missing missing = new Missing();
-        for (UUID u : all.toUserIds()) {
+        for (QualifiedId u : all.toUserIds()) {
             if (userId.equals(u)) {
                 Collection<String> clients = all.toClients(u);
                 missing.add(u, clients);
@@ -147,12 +149,12 @@ public abstract class WireClientBase implements WireClient {
     }
 
     @Override
-    public Collection<User> getUsers(Collection<UUID> userIds) {
+    public Collection<User> getUsers(Collection<QualifiedId> userIds) {
         return api.getUsers(userIds);
     }
 
     @Override
-    public User getUser(UUID userId) {
+    public User getUser(QualifiedId userId) {
         Collection<User> users = api.getUsers(Collections.singleton(userId));
         return users.iterator().next();
     }
@@ -163,7 +165,7 @@ public abstract class WireClientBase implements WireClient {
     }
 
     @Override
-    public void acceptConnection(UUID user) throws Exception {
+    public void acceptConnection(QualifiedId user) throws Exception {
         api.acceptConnection(user);
     }
 
@@ -192,7 +194,7 @@ public abstract class WireClientBase implements WireClient {
     }
 
     @Override
-    public String decrypt(UUID userId, String clientId, String cypher) throws CryptoException {
+    public String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException {
         return crypto.decrypt(userId, clientId, cypher);
     }
 
@@ -223,28 +225,28 @@ public abstract class WireClientBase implements WireClient {
     }
 
     @Override
-    public Conversation createConversation(String name, UUID teamId, List<UUID> users) throws HttpException {
+    public Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException {
         return api.createConversation(name, teamId, users);
     }
 
     @Override
-    public Conversation createOne2One(UUID teamId, UUID userId) throws HttpException {
+    public Conversation createOne2One(UUID teamId, QualifiedId userId) throws HttpException {
         return api.createOne2One(teamId, userId);
     }
 
     @Override
-    public void leaveConversation(UUID userId) throws HttpException {
+    public void leaveConversation(QualifiedId userId) throws HttpException {
         api.leaveConversation(userId);
     }
 
     @Override
-    public User addParticipants(UUID... userIds) throws HttpException {
+    public Conversation addParticipants(QualifiedId... userIds) throws HttpException {
         return api.addParticipants(userIds);
     }
 
     @Override
-    public User addService(UUID serviceId, UUID providerId) throws HttpException {
-        return api.addService(serviceId, providerId);
+    public void addService(UUID serviceId, UUID providerId) throws HttpException {
+        api.addService(serviceId, providerId);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.wire.xenon;
 
 import com.wire.xenon.assets.IAsset;
 import com.wire.xenon.backend.models.Conversation;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.User;
 import com.wire.xenon.exceptions.HttpException;
 import com.wire.xenon.models.AssetKey;
@@ -17,9 +18,9 @@ import java.util.UUID;
 public interface WireAPI {
     Devices sendMessage(OtrMessage msg, Object... ignoreMissing) throws HttpException;
 
-    Devices sendPartialMessage(OtrMessage msg, UUID userId) throws HttpException;
+    Devices sendPartialMessage(OtrMessage msg, QualifiedId userId) throws HttpException;
 
-    Collection<User> getUsers(Collection<UUID> ids);
+    Collection<User> getUsers(Collection<QualifiedId> ids);
 
     User getSelf();
 
@@ -37,25 +38,25 @@ public interface WireAPI {
 
     boolean deleteConversation(UUID teamId) throws HttpException;
 
-    User addService(UUID serviceId, UUID providerId) throws HttpException;
+    void addService(UUID serviceId, UUID providerId) throws HttpException;
 
-    User addParticipants(UUID... userIds) throws HttpException;
+    Conversation addParticipants(QualifiedId... userIds) throws HttpException;
 
-    Conversation createConversation(String name, UUID teamId, List<UUID> users) throws HttpException;
+    Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException;
 
-    Conversation createOne2One(UUID teamId, UUID userId) throws HttpException;
+    Conversation createOne2One(UUID teamId, QualifiedId userId) throws HttpException;
 
-    void leaveConversation(UUID user) throws HttpException;
+    void leaveConversation(QualifiedId user) throws HttpException;
 
-    User getUser(UUID userId) throws HttpException;
+    User getUser(QualifiedId userId) throws HttpException;
 
-    UUID getUserId(String handle) throws HttpException;
+    QualifiedId getUserId(String handle) throws HttpException;
 
-    boolean hasDevice(UUID userId, String clientId);
+    boolean hasDevice(QualifiedId userId, String clientId);
 
     UUID getTeam() throws HttpException;
 
-    Collection<UUID> getTeamMembers(UUID teamId);
+    Collection<QualifiedId> getTeamMembers(UUID teamId);
 
-    void acceptConnection(UUID user) throws Exception;
+    void acceptConnection(QualifiedId user) throws Exception;
 }

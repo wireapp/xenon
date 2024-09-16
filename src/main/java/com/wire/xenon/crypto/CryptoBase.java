@@ -20,6 +20,7 @@ package com.wire.xenon.crypto;
 
 import com.wire.bots.cryptobox.CryptoException;
 import com.wire.bots.cryptobox.ICryptobox;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.models.otr.Missing;
 import com.wire.xenon.models.otr.PreKey;
 import com.wire.xenon.models.otr.PreKeys;
@@ -28,7 +29,6 @@ import com.wire.xenon.models.otr.Recipients;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.UUID;
 
 /**
  * Wrapper for the Crypto Box. This class is thread safe.
@@ -46,8 +46,21 @@ abstract class CryptoBase implements Crypto {
         return ret;
     }
 
-    private static String createId(UUID userId, String clientId) {
-        return String.format("%s_%s", userId, clientId);
+    /**
+     * Create crypto session identifier from user and client.
+     *
+     * <p>
+     *     Logic handles users with (domain + id) supporting federation of backends.
+     *     To be backward compatible, domain being null is supported, meaning the domain is "local",
+     *     i.e. the user and the service creating the crypto session are on the same backend
+     * </p>
+     * @param userId a user with UUID or UUID + String (domain)
+     * @param clientId a string identifying one client
+     * @return a String identifying the file/row location of the crypto session
+     */
+    private static String createId(QualifiedId userId, String clientId) {
+        String sid = userId.domain != null ? userId.toString() : userId.id.toString();
+        return String.format("%s_%s", sid, clientId);
     }
 
     public abstract ICryptobox box();
@@ -103,7 +116,7 @@ abstract class CryptoBase implements Crypto {
     @Override
     public Recipients encrypt(PreKeys preKeys, byte[] content) throws CryptoException {
         Recipients recipients = new Recipients();
-        for (UUID userId : preKeys.keySet()) {
+        for (QualifiedId userId : preKeys.keySet()) {
             HashMap<String, PreKey> clients = preKeys.get(userId);
             for (String clientId : clients.keySet()) {
                 PreKey pk = clients.get(clientId);
@@ -128,7 +141,7 @@ abstract class CryptoBase implements Crypto {
     @Override
     public Recipients encrypt(Missing missing, byte[] content) throws CryptoException {
         Recipients recipients = new Recipients();
-        for (UUID userId : missing.toUserIds()) {
+        for (QualifiedId userId : missing.toUserIds()) {
             for (String clientId : missing.toClients(userId)) {
                 String id = createId(userId, clientId);
                 byte[] cipher = box().encryptFromSession(id, content);
@@ -151,7 +164,7 @@ abstract class CryptoBase implements Crypto {
      * @throws CryptoException throws Exception
      */
     @Override
-    public String decrypt(UUID userId, String clientId, String cypher) throws CryptoException {
+    public String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException {
         byte[] decode = Base64.getDecoder().decode(cypher);
         String id = createId(userId, clientId);
 

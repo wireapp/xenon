@@ -22,6 +22,7 @@ import com.wire.bots.cryptobox.CryptoException;
 import com.wire.xenon.assets.IAsset;
 import com.wire.xenon.assets.IGeneric;
 import com.wire.xenon.backend.models.Conversation;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.User;
 import com.wire.xenon.exceptions.HttpException;
 import com.wire.xenon.models.AssetKey;
@@ -52,12 +53,12 @@ public interface WireClient extends Closeable {
      * @param userId  ignore all other participants except this user
      * @throws Exception
      */
-    void send(IGeneric message, UUID userId) throws Exception;
+    void send(IGeneric message, QualifiedId userId) throws Exception;
 
     /**
      * This method downloads asset from the Backend.
      *
-     * @param assetKey        Unique asset identifier (UUID)
+     * @param assetKey        Unique asset identifier (String)
      * @param assetToken      Asset token (null in case of public assets)
      * @param sha256Challenge SHA256 hash code for this asset
      * @param otrKey          Encryption key to be used to decrypt the data
@@ -72,21 +73,21 @@ public interface WireClient extends Closeable {
     UUID getId();
 
     /**
-     * Fetch the bot's own user profile information. A bot's profile has the following attributes:
+     * Fetch the bot's or user's own user profile information. A bot's profile has the following attributes:
      * <p>
-     * id (String): The bot's user ID.
-     * name (String): The bot's name.
-     * accent_id (Number): The bot's accent colour.
-     * assets (Array): The bot's public profile assets (e.g. images).
+     * id (String): The requester's user ID.
+     * name (String): The requester's name.
+     * accent_id (Number): The requester's accent colour.
+     * assets (Array): The requester's public profile assets (e.g. images).
      *
-     * @return
+     * @return the requester's data, either user or bot
      */
     User getSelf() throws HttpException;
 
     /**
-     * @return Conversation ID as UUID
+     * @return Conversation ID as Qualified. Id and domain supporting federation
      */
-    UUID getConversationId();
+    QualifiedId getConversationId();
 
     /**
      * @return Device ID as returned by the Wire Backend
@@ -96,20 +97,20 @@ public interface WireClient extends Closeable {
     /**
      * Fetch users' profiles from the Backend
      *
-     * @param userIds User IDs (UUID) that are being requested
+     * @param userIds User IDs (Qualified) that are being requested
      * @return Collection of user profiles (name, accent colour,...)
      * @throws HttpException
      */
-    Collection<User> getUsers(Collection<UUID> userIds) throws HttpException;
+    Collection<User> getUsers(Collection<QualifiedId> userIds) throws HttpException;
 
     /**
      * Fetch users' profiles from the Backend
      *
-     * @param userId User ID (UUID) that are being requested
+     * @param userId User ID (Qualified) that are being requested
      * @return User profile (name, accent colour,...)
      * @throws HttpException
      */
-    User getUser(UUID userId) throws HttpException;
+    User getUser(QualifiedId userId) throws HttpException;
 
     /**
      * Fetch conversation details from the Backend
@@ -124,10 +125,10 @@ public interface WireClient extends Closeable {
      * running the sdk as a regular user and you need to
      * accept/reject a connect request.
      *
-     * @param user User ID as UUID
+     * @param user User ID as Qualified
      * @throws Exception
      */
-    void acceptConnection(UUID user) throws Exception;
+    void acceptConnection(QualifiedId user) throws Exception;
 
     /**
      * Decrypt cipher either using existing session or it creates new session from this cipher and decrypts
@@ -138,7 +139,7 @@ public interface WireClient extends Closeable {
      * @return Base64 encoded decrypted text
      * @throws CryptoException
      */
-    String decrypt(UUID userId, String clientId, String cypher) throws CryptoException;
+    String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException;
 
     /**
      * Invoked by the sdk. Called once when the conversation is created
@@ -202,15 +203,15 @@ public interface WireClient extends Closeable {
 
     UUID getTeam() throws HttpException;
 
-    Conversation createConversation(String name, UUID teamId, List<UUID> users) throws HttpException;
+    Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException;
 
-    Conversation createOne2One(UUID teamId, UUID userId) throws HttpException;
+    Conversation createOne2One(UUID teamId, QualifiedId userId) throws HttpException;
 
-    void leaveConversation(UUID userId) throws HttpException;
+    void leaveConversation(QualifiedId userId) throws HttpException;
 
-    User addParticipants(UUID... userIds) throws HttpException;
+    Conversation addParticipants(QualifiedId... userIds) throws HttpException;
 
-    User addService(UUID serviceId, UUID providerId) throws HttpException;
+    void addService(UUID serviceId, UUID providerId) throws HttpException;
 
     boolean deleteConversation(UUID teamId) throws HttpException;
 }

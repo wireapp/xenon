@@ -3,7 +3,6 @@ package com.wire.xenon;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.sql.Driver;
@@ -15,29 +14,24 @@ abstract public class DatabaseTestBase {
 
     @BeforeAll
     public static void initiate() throws Exception {
-        var databaseUrl = System.getenv("POSTGRES_URL");
-        databaseUrl = "jdbc:postgresql://" + (databaseUrl != null ? databaseUrl : "localhost/lithium");
-        var user = System.getenv("POSTGRES_USER");
-        var password = System.getenv("POSTGRES_PASSWORD");
+        String databaseUrl = System.getenv("POSTGRES_URL");
+        String jdbcUrl = "jdbc:postgresql://" + (databaseUrl != null ? databaseUrl : "localhost/postgres");
+        String user = System.getenv("POSTGRES_USER") != null ? System.getenv("POSTGRES_USER") : "postgres";
+        String password = System.getenv("POSTGRES_PASSWORD") != null ? System.getenv("POSTGRES_PASSWORD") : "postgres";
 
-        var driverClass = Class.forName("org.postgresql.Driver");
+        final Class<?> driverClass = Class.forName("org.postgresql.Driver");
         final Driver driver = (Driver) driverClass.getDeclaredConstructor().newInstance();
         DriverManager.registerDriver(driver);
 
-        jdbi = (password != null ? Jdbi.create(databaseUrl, user, password) : Jdbi.create(databaseUrl))
+        jdbi = (password != null ? Jdbi.create(jdbcUrl, user, password) : Jdbi.create(jdbcUrl))
                 .installPlugin(new SqlObjectPlugin());
 
         flyway = Flyway
                 .configure()
-                .dataSource(databaseUrl, user, password)
+                .dataSource(jdbcUrl, user, password)
                 .baselineOnMigrate(true)
                 .load();
 
         flyway.migrate();
-    }
-
-    @AfterAll
-    public static void classCleanup() {
-        flyway.clean();
     }
 }
