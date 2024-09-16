@@ -53,6 +53,8 @@ public class Payload {
     // User Mode
     @JsonProperty
     public Connection connection;
+    @JsonProperty
+    public User user;
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Data {
