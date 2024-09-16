@@ -18,12 +18,47 @@
 
 package com.wire.xenon.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.waz.model.Messages;
+import com.wire.xenon.backend.models.QualifiedId;
 
+import java.util.UUID;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VideoPreviewMessage extends OriginMessage {
+    @JsonProperty
     private long duration;
+    @JsonProperty
     private int width;
+    @JsonProperty
     private int height;
+
+    @JsonCreator
+    public VideoPreviewMessage(
+        @JsonProperty("eventId") UUID eventId,
+        @JsonProperty("messageId") UUID messageId,
+        @JsonProperty("conversationId") QualifiedId convId,
+        @JsonProperty("clientId") String clientId,
+        @JsonProperty("userId") QualifiedId userId,
+        @JsonProperty("time") String time,
+        @JsonProperty("mimeType") String mimeType,
+        @JsonProperty("size") long size,
+        @JsonProperty("name") String name,
+        @JsonProperty("width") int width,
+        @JsonProperty("height") int height,
+        @JsonProperty("duration") long duration) {
+        super(eventId, messageId, convId, clientId, userId, time);
+
+        setMimeType(mimeType);
+        setName(name);
+        setSize(size);
+
+        setWidth(width);
+        setHeight(height);
+        setDuration(duration);
+    }
 
     public VideoPreviewMessage(MessageBase msg, Messages.Asset.Original original) {
         super(msg);

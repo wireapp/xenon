@@ -18,14 +18,39 @@
 
 package com.wire.xenon.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wire.xenon.backend.models.QualifiedId;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TextMessage extends MessageBase {
+    @JsonProperty
     private String text;
+
+    @JsonProperty
     private UUID quotedMessageId;
+
+    @JsonProperty
     private byte[] quotedMessageSha256;
+
+    @JsonProperty
     private final ArrayList<Mention> mentions = new ArrayList<>();
+
+    @JsonCreator
+    public TextMessage(@JsonProperty("eventId") UUID eventId,
+                       @JsonProperty("messageId") UUID messageId,
+                       @JsonProperty("conversationId") QualifiedId convId,
+                       @JsonProperty("clientId") String clientId,
+                       @JsonProperty("userId") QualifiedId userId,
+                       @JsonProperty("time") String time) {
+        super(eventId, messageId, convId, clientId, userId, time);
+    }
 
     public TextMessage(MessageBase msg) {
         super(msg);
@@ -55,9 +80,9 @@ public class TextMessage extends MessageBase {
         this.quotedMessageSha256 = quotedMessageSha256;
     }
 
-    public void addMention(String userId, int offset, int len) {
+    public void addMention(QualifiedId userId, int offset, int len) {
         Mention mention = new Mention();
-        mention.userId = UUID.fromString(userId);
+        mention.userId = userId;
         mention.offset = offset;
         mention.length = len;
 
@@ -69,7 +94,7 @@ public class TextMessage extends MessageBase {
     }
 
     public static class Mention {
-        public UUID userId;
+        public QualifiedId userId;
         public int offset;
         public int length;
     }

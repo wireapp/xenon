@@ -18,10 +18,27 @@
 
 package com.wire.xenon.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wire.xenon.backend.models.QualifiedId;
+
 import java.util.UUID;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EditedTextMessage extends TextMessage {
+    @JsonProperty
     private UUID replacingMessageId;
+
+    @JsonCreator
+    public EditedTextMessage(@JsonProperty("eventId") UUID eventId,
+                             @JsonProperty("messageId") UUID messageId,
+                             @JsonProperty("conversationId") QualifiedId convId,
+                             @JsonProperty("clientId") String clientId,
+                             @JsonProperty("userId") QualifiedId userId,
+                             @JsonProperty("time") String time) {
+        super(eventId, messageId, convId, clientId, userId, time);
+    }
 
     public EditedTextMessage(MessageBase msg) {
         super(msg);

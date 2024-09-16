@@ -18,8 +18,30 @@
 
 package com.wire.xenon.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wire.xenon.backend.models.QualifiedId;
+
+import java.util.UUID;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EphemeralTextMessage extends TextMessage {
+    @JsonProperty
     private long expireAfterMillis;
+
+    @JsonCreator
+    public EphemeralTextMessage(@JsonProperty("eventId") UUID eventId,
+                                @JsonProperty("messageId") UUID messageId,
+                                @JsonProperty("conversationId") QualifiedId convId,
+                                @JsonProperty("clientId") String clientId,
+                                @JsonProperty("userId") QualifiedId userId,
+                                @JsonProperty("time") String time,
+                                @JsonProperty("expireAfterMillis") long expireAfterMillis
+    ) {
+        super(eventId, messageId, convId, clientId, userId, time);
+        this.expireAfterMillis = expireAfterMillis;
+    }
 
     public EphemeralTextMessage(MessageBase msg) {
         super(msg);

@@ -21,6 +21,7 @@ package com.wire.xenon.backend;
 import com.waz.model.Messages;
 import com.wire.xenon.MessageHandlerBase;
 import com.wire.xenon.WireClient;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.models.*;
 import com.wire.xenon.tools.Logger;
 
@@ -161,8 +162,13 @@ public class GenericMessageProcessor {
             final String quotedMessageId = text.getQuote().getQuotedMessageId();
             textMessage.setQuotedMessageId(UUID.fromString(quotedMessageId));
         }
-        for (Messages.Mention mention : text.getMentionsList())
-            textMessage.addMention(mention.getUserId(), mention.getStart(), mention.getLength());
+        for (Messages.Mention mention : text.getMentionsList()) {
+            final QualifiedId userMentionedId = new QualifiedId(
+                UUID.fromString(mention.getQualifiedUserId().getId()),
+                mention.getQualifiedUserId().getDomain()
+            );
+            textMessage.addMention(userMentionedId, mention.getStart(), mention.getLength());
+        }
         return textMessage;
     }
 
