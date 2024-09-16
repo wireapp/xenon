@@ -3,6 +3,7 @@ package com.wire.xenon;
 import com.google.protobuf.ByteString;
 import com.waz.model.Messages;
 import com.wire.xenon.backend.GenericMessageProcessor;
+import com.wire.xenon.backend.models.Qualified;
 import com.wire.xenon.models.AudioPreviewMessage;
 import com.wire.xenon.models.LinkPreviewMessage;
 import com.wire.xenon.models.MessageBase;
@@ -38,8 +39,8 @@ public class GenericMessageProcessorTest {
 
         UUID eventId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        UUID from = UUID.randomUUID();
-        UUID convId = UUID.randomUUID();
+        Qualified from = new Qualified(UUID.randomUUID(), UUID.randomUUID().toString());
+        Qualified convId = new Qualified(UUID.randomUUID(), UUID.randomUUID().toString());
         String sender = UUID.randomUUID().toString();
         String time = new Date().toString();
 
@@ -88,8 +89,8 @@ public class GenericMessageProcessorTest {
 
         UUID eventId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        UUID from = UUID.randomUUID();
-        UUID convId = UUID.randomUUID();
+        Qualified from = new Qualified(UUID.randomUUID(), UUID.randomUUID().toString());
+        Qualified convId = new Qualified(UUID.randomUUID(), UUID.randomUUID().toString());
         String sender = UUID.randomUUID().toString();
         String time = new Date().toString();
         byte[] levels = new byte[100];
@@ -123,8 +124,8 @@ public class GenericMessageProcessorTest {
 
         UUID eventId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        UUID from = UUID.randomUUID();
-        UUID convId = UUID.randomUUID();
+        Qualified from = new Qualified(UUID.randomUUID(), UUID.randomUUID().toString());
+        Qualified convId = new Qualified(UUID.randomUUID(), UUID.randomUUID().toString());
         String sender = UUID.randomUUID().toString();
         String time = new Date().toString();
         byte[] levels = new byte[100];

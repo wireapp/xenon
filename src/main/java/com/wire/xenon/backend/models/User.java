@@ -22,12 +22,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
+/**
+ * User representation in the payload of user focussed notifications.
+ * <p>
+ * Events inside notifications and different endpoints have different subsets of these fields
+ * </p>
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
-    @JsonProperty
-    public UUID id;
+    @JsonProperty("qualified_id")
+    public Qualified id;
 
     @JsonProperty
     public String name;
@@ -40,6 +45,9 @@ public class User {
 
     @JsonProperty
     public Service service;
+
+    @JsonProperty
+    public String email;
 
     @JsonProperty
     public ArrayList<Asset> assets;

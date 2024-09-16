@@ -18,32 +18,9 @@
 
 package com.wire.xenon.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.waz.model.Messages;
 
-import java.util.UUID;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FilePreviewMessage extends OriginMessage {
-    @JsonCreator
-    public FilePreviewMessage(@JsonProperty("eventId") UUID eventId,
-                              @JsonProperty("messageId") UUID messageId,
-                              @JsonProperty("conversationId") UUID convId,
-                              @JsonProperty("clientId") String clientId,
-                              @JsonProperty("userId") UUID userId,
-                              @JsonProperty("time") String time,
-                              @JsonProperty("mimeType") String mimeType,
-                              @JsonProperty("size") long size,
-                              @JsonProperty("name") String name) {
-        super(eventId, messageId, convId, clientId, userId, time);
-
-        setMimeType(mimeType);
-        setName(name);
-        setSize(size);
-    }
-
 
     public FilePreviewMessage(MessageBase msg, Messages.Asset.Original original) {
         super(msg);

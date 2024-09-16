@@ -18,6 +18,8 @@
 
 package com.wire.xenon.models;
 
+import com.wire.xenon.backend.models.Qualified;
+
 import java.util.UUID;
 
 public abstract class OriginMessage extends MessageBase {
@@ -25,7 +27,7 @@ public abstract class OriginMessage extends MessageBase {
     private String name;
     private long size;
 
-    public OriginMessage(UUID eventId, UUID msgId, UUID convId, String clientId, UUID userId, String time) {
+    public OriginMessage(UUID eventId, UUID msgId, Qualified convId, String clientId, Qualified userId, String time) {
         super(eventId, msgId, convId, clientId, userId, time);
     }
 

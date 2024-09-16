@@ -18,15 +18,20 @@
 
 package com.wire.xenon.models.otr;
 
+import com.wire.xenon.backend.models.Qualified;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
-public class PreKeys extends HashMap<UUID, HashMap<String, PreKey>> {
+/**
+ * Structure holding qualified users and a Prekey for each of their clients.
+ *
+ */
+public class PreKeys extends HashMap<Qualified, HashMap<String, PreKey>> {
     public PreKeys() {
     }
 
-    public PreKeys(ArrayList<PreKey> array, String clientId, UUID userId) {
+    public PreKeys(ArrayList<PreKey> array, String clientId, Qualified userId) {
         super();
 
         HashMap<String, PreKey> devs = new HashMap<>();

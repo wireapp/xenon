@@ -18,29 +18,11 @@
 
 package com.wire.xenon.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.UUID;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReactionMessage extends MessageBase {
-    @JsonProperty
     private String emoji;
-
-    @JsonProperty
     private UUID reactionMessageId;
-
-    @JsonCreator
-    public ReactionMessage(@JsonProperty("eventId") UUID eventId,
-                           @JsonProperty("messageId") UUID messageId,
-                           @JsonProperty("conversationId") UUID convId,
-                           @JsonProperty("clientId") String clientId,
-                           @JsonProperty("userId") UUID userId,
-                           @JsonProperty("time") String time) {
-        super(eventId, messageId, convId, clientId, userId, time);
-    }
 
     public ReactionMessage(MessageBase msgBase) {
         super(msgBase);

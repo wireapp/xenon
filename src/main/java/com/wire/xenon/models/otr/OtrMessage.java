@@ -19,9 +19,9 @@
 package com.wire.xenon.models.otr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wire.xenon.backend.models.Qualified;
 
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 public class OtrMessage {
     @JsonProperty
@@ -41,7 +41,7 @@ public class OtrMessage {
         recipients.add(rec);
     }
 
-    public String get(UUID userId, String clientId) {
+    public String get(Qualified userId, String clientId) {
         return recipients.get(userId, clientId);
     }
 

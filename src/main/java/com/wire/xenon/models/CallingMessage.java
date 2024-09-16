@@ -18,26 +18,8 @@
 
 package com.wire.xenon.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.UUID;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class CallingMessage extends MessageBase {
-    @JsonProperty
     private String content;
-
-    @JsonCreator
-    public CallingMessage(@JsonProperty("eventId") UUID eventId,
-                          @JsonProperty("messageId") UUID messageId,
-                          @JsonProperty("conversationId") UUID convId,
-                          @JsonProperty("clientId") String clientId,
-                          @JsonProperty("userId") UUID userId,
-                          @JsonProperty("time") String time) {
-        super(eventId, messageId, convId, clientId, userId, time);
-    }
 
     public CallingMessage(MessageBase msgBase) {
         super(msgBase);

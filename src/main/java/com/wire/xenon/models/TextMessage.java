@@ -18,38 +18,14 @@
 
 package com.wire.xenon.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.UUID;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TextMessage extends MessageBase {
-    @JsonProperty
     private String text;
-
-    @JsonProperty
     private UUID quotedMessageId;
-
-    @JsonProperty
     private byte[] quotedMessageSha256;
-
-    @JsonProperty
     private final ArrayList<Mention> mentions = new ArrayList<>();
-
-    @JsonCreator
-    public TextMessage(@JsonProperty("eventId") UUID eventId,
-                       @JsonProperty("messageId") UUID messageId,
-                       @JsonProperty("conversationId") UUID convId,
-                       @JsonProperty("clientId") String clientId,
-                       @JsonProperty("userId") UUID userId,
-                       @JsonProperty("time") String time) {
-        super(eventId, messageId, convId, clientId, userId, time);
-    }
 
     public TextMessage(MessageBase msg) {
         super(msg);

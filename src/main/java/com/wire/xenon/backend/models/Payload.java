@@ -25,6 +25,10 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Part of response of events fetched from the backend, coming either via notification Rest endpoint or
+ * web-socket stream.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Payload {
     @JsonProperty
@@ -49,31 +53,24 @@ public class Payload {
     // User Mode
     @JsonProperty
     public Connection connection;
-    @JsonProperty
-    public User user;
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Data {
         @JsonProperty
-        @NotNull
         public String sender;
         @JsonProperty
-        @NotNull
         public String recipient;
         @JsonProperty
         public String text;
-        @JsonProperty("user_ids")
-        public List<UUID> userIds;
+        // Depending on event type, users can be represented via complete object or just array of qualified ids
+        @JsonProperty("qualified_user_ids")
+        public List<Qualified> userIds;
+        @JsonProperty
+        public List<User> users;
         @JsonProperty
         public String name;
 
         // User Mode
-        @JsonProperty
-        public String id;
-        @JsonProperty
-        public String key;
-        @JsonProperty
-        public UUID user;
         @JsonProperty
         public UUID creator;
         @JsonProperty
@@ -86,33 +83,14 @@ public class Payload {
         @JsonProperty
         public String status;
 
-        @JsonProperty
-        public UUID from;
+        @JsonProperty("qualified_from")
+        public Qualified from;
 
-        @JsonProperty
-        public UUID to;
+        @JsonProperty("qualified_to")
+        public Qualified to;
 
-        @JsonProperty("conversation")
-        public UUID convId;
-    }
-
-    // User Mode
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class User {
-        @JsonProperty
-        public UUID id;
-
-        @JsonProperty
-        public String name;
-
-        @JsonProperty("accent_id")
-        public int accent;
-
-        @JsonProperty
-        public String handle;
-
-        @JsonProperty
-        public String email;
+        @JsonProperty("qualified_conversation")
+        public Qualified conversation;
     }
 
     // User Mode
@@ -122,22 +100,4 @@ public class Payload {
         public List<Member> others;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Qualified {
-        public Qualified(UUID id, String domain) {
-            this.id = id;
-            this.domain = domain;
-        }
-
-        public Qualified() {
-        }
-
-        @JsonProperty
-        @NotNull
-        public UUID id;
-
-        @JsonProperty
-        @NotNull
-        public String domain;
-    }
 }

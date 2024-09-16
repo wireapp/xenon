@@ -18,40 +18,13 @@
 
 package com.wire.xenon.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.waz.model.Messages;
 
-import java.util.UUID;
-
 public class RemoteMessage extends MessageBase {
-    @JsonProperty
     private String assetId;
-    @JsonProperty
     private String assetToken;
-    @JsonProperty
     private byte[] otrKey;
-    @JsonProperty
     private byte[] sha256;
-
-    @JsonCreator
-    public RemoteMessage(@JsonProperty("eventId") UUID eventId,
-                         @JsonProperty("messageId") UUID messageId,
-                         @JsonProperty("conversationId") UUID convId,
-                         @JsonProperty("clientId") String clientId,
-                         @JsonProperty("userId") UUID userId,
-                         @JsonProperty("time") String time,
-                         @JsonProperty("assetId") String assetId,
-                         @JsonProperty("assetToken") String assetToken,
-                         @JsonProperty("otrKey") byte[] otrKey,
-                         @JsonProperty("sha256") byte[] sha256) {
-        super(eventId, messageId, convId, clientId, userId, time);
-
-        setAssetId(assetId);
-        setAssetToken(assetToken);
-        setSha256(sha256);
-        setOtrKey(otrKey);
-    }
 
     public RemoteMessage(MessageBase msg, Messages.Asset.RemoteData uploaded) {
         super(msg);
