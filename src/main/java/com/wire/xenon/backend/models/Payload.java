@@ -36,10 +36,10 @@ public class Payload {
     public String type;
 
     @JsonProperty("qualified_conversation")
-    public Qualified conversation;
+    public QualifiedId conversation;
 
     @JsonProperty("qualified_from")
-    public Qualified from;
+    public QualifiedId from;
 
     @JsonProperty
     public String time;
@@ -64,7 +64,7 @@ public class Payload {
         public String text;
         // Depending on event type, users can be represented via complete object or just array of qualified ids
         @JsonProperty("qualified_user_ids")
-        public List<Qualified> userIds;
+        public List<QualifiedId> userIds;
         @JsonProperty
         public List<User> users;
         @JsonProperty
@@ -84,13 +84,13 @@ public class Payload {
         public String status;
 
         @JsonProperty("qualified_from")
-        public Qualified from;
+        public QualifiedId from;
 
         @JsonProperty("qualified_to")
-        public Qualified to;
+        public QualifiedId to;
 
         @JsonProperty("qualified_conversation")
-        public Qualified conversation;
+        public QualifiedId conversation;
     }
 
     // User Mode

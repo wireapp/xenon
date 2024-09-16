@@ -22,7 +22,7 @@ import com.wire.bots.cryptobox.CryptoDb;
 import com.wire.bots.cryptobox.CryptoException;
 import com.wire.bots.cryptobox.ICryptobox;
 import com.wire.bots.cryptobox.IStorage;
-import com.wire.xenon.backend.models.Qualified;
+import com.wire.xenon.backend.models.QualifiedId;
 
 import java.io.IOException;
 
@@ -43,7 +43,7 @@ public class CryptoDatabase extends CryptoBase {
      * @param userId User id
      * @param storage Instance of a IStorage class
      */
-    public CryptoDatabase(Qualified userId, IStorage storage) throws CryptoException {
+    public CryptoDatabase(QualifiedId userId, IStorage storage) throws CryptoException {
         try {
             box = new CryptoDb(userId.toString(), storage);
         } catch (IOException e) {
@@ -51,7 +51,7 @@ public class CryptoDatabase extends CryptoBase {
         }
     }
 
-    public CryptoDatabase(Qualified userId, IStorage storage, String dir) throws CryptoException {
+    public CryptoDatabase(QualifiedId userId, IStorage storage, String dir) throws CryptoException {
         try {
             box = new CryptoDb(userId.toString(), storage, dir);
         } catch (IOException e) {

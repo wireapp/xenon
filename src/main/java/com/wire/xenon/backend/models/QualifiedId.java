@@ -8,13 +8,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Qualified {
-    public Qualified(UUID id, String domain) {
+public class QualifiedId {
+    public QualifiedId(UUID id, String domain) {
         this.id = Objects.requireNonNull(id, "UUID cannot be null");
         this.domain = domain;
     }
 
-    public Qualified() {
+    public QualifiedId() {
     }
 
     @JsonProperty
@@ -27,9 +27,9 @@ public class Qualified {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Qualified)) return false;
-        Qualified qualified = (Qualified) o;
-        return Objects.equals(id, qualified.id) && Objects.equals(domain, qualified.domain);
+        if (!(o instanceof QualifiedId)) return false;
+        QualifiedId qualifiedId = (QualifiedId) o;
+        return Objects.equals(id, qualifiedId.id) && Objects.equals(domain, qualifiedId.domain);
     }
 
     @Override

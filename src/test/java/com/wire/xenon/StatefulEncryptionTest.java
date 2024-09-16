@@ -4,7 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.waz.model.Messages;
 import com.wire.bots.cryptobox.IStorage;
 import com.wire.xenon.assets.MessageText;
-import com.wire.xenon.backend.models.Qualified;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.crypto.CryptoDatabase;
 import com.wire.xenon.crypto.storage.JdbiStorage;
 import com.wire.xenon.models.otr.PreKey;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class StatefulEncryptionTest extends DatabaseTestBase {
     @Test
     public void testAliceToAlice() throws Exception {
-        Qualified aliceId = new Qualified(UUID.randomUUID(), UUID.randomUUID().toString());
+        QualifiedId aliceId = new QualifiedId(UUID.randomUUID(), UUID.randomUUID().toString());
         String client1 = "alice1_" + UUID.randomUUID();
         String rootFolder = "xenon-unit-test-" + UUID.randomUUID();
         IStorage storage = new JdbiStorage(jdbi);

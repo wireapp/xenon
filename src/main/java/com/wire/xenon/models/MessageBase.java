@@ -18,19 +18,19 @@
 
 package com.wire.xenon.models;
 
-import com.wire.xenon.backend.models.Qualified;
+import com.wire.xenon.backend.models.QualifiedId;
 
 import java.util.UUID;
 
 public class MessageBase {
     protected final UUID messageId;
     protected final UUID eventId;
-    protected final Qualified userId;
+    protected final QualifiedId userId;
     protected final String clientId;
-    protected final Qualified conversationId;
+    protected final QualifiedId conversationId;
     protected final String time;
 
-    public MessageBase(UUID eventId, UUID msgId, Qualified convId, String clientId, Qualified userId, String time) {
+    public MessageBase(UUID eventId, UUID msgId, QualifiedId convId, String clientId, QualifiedId userId, String time) {
         this.eventId = eventId;
         this.messageId = msgId;
         this.conversationId = convId;
@@ -48,11 +48,11 @@ public class MessageBase {
         this.time = msg.time;
     }
 
-    public Qualified getConversationId() {
+    public QualifiedId getConversationId() {
         return conversationId;
     }
 
-    public Qualified getUserId() {
+    public QualifiedId getUserId() {
         return userId;
     }
 

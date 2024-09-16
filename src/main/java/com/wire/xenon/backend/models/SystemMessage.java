@@ -15,7 +15,7 @@ public class SystemMessage {
     public UUID id;
     public String type;
     public String time;
-    public Qualified from;
+    public QualifiedId from;
     public Conversation conversation;
-    public List<Qualified> users;
+    public List<QualifiedId> users;
 }

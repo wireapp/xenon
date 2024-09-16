@@ -5,7 +5,7 @@ import com.wire.xenon.assets.IAsset;
 import com.wire.xenon.assets.IGeneric;
 import com.wire.xenon.backend.models.Conversation;
 import com.wire.xenon.backend.models.NewBot;
-import com.wire.xenon.backend.models.Qualified;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.User;
 import com.wire.xenon.crypto.Crypto;
 import com.wire.xenon.exceptions.HttpException;
@@ -37,7 +37,7 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public void send(IGeneric message, Qualified userId) throws Exception {
+    public void send(IGeneric message, QualifiedId userId) throws Exception {
         postGenericMessage(message, userId);
     }
 
@@ -52,7 +52,7 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public Qualified getConversationId() {
+    public QualifiedId getConversationId() {
         return state.conversation.id;
     }
 
@@ -104,11 +104,11 @@ public class WireClientBase implements WireClient {
         }
     }
 
-    protected void postGenericMessage(IGeneric generic, Qualified userId) throws Exception {
+    protected void postGenericMessage(IGeneric generic, QualifiedId userId) throws Exception {
         // Try to encrypt the msg for those devices that we have the session already
         Missing all = getAllDevices();
         Missing missing = new Missing();
-        for (Qualified u : all.toUserIds()) {
+        for (QualifiedId u : all.toUserIds()) {
             if (userId.equals(u)) {
                 Collection<String> clients = all.toClients(u);
                 missing.add(u, clients);
@@ -149,12 +149,12 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public Collection<User> getUsers(Collection<Qualified> userIds) {
+    public Collection<User> getUsers(Collection<QualifiedId> userIds) {
         return api.getUsers(userIds);
     }
 
     @Override
-    public User getUser(Qualified userId) {
+    public User getUser(QualifiedId userId) {
         Collection<User> users = api.getUsers(Collections.singleton(userId));
         return users.iterator().next();
     }
@@ -165,7 +165,7 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public void acceptConnection(Qualified user) throws Exception {
+    public void acceptConnection(QualifiedId user) throws Exception {
         api.acceptConnection(user);
     }
 
@@ -194,7 +194,7 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public String decrypt(Qualified userId, String clientId, String cypher) throws CryptoException {
+    public String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException {
         return crypto.decrypt(userId, clientId, cypher);
     }
 
@@ -225,22 +225,22 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public Conversation createConversation(String name, UUID teamId, List<Qualified> users) throws HttpException {
+    public Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException {
         return api.createConversation(name, teamId, users);
     }
 
     @Override
-    public Conversation createOne2One(UUID teamId, Qualified userId) throws HttpException {
+    public Conversation createOne2One(UUID teamId, QualifiedId userId) throws HttpException {
         return api.createOne2One(teamId, userId);
     }
 
     @Override
-    public void leaveConversation(Qualified userId) throws HttpException {
+    public void leaveConversation(QualifiedId userId) throws HttpException {
         api.leaveConversation(userId);
     }
 
     @Override
-    public Conversation addParticipants(Qualified... userIds) throws HttpException {
+    public Conversation addParticipants(QualifiedId... userIds) throws HttpException {
         return api.addParticipants(userIds);
     }
 

@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Member {
     @JsonProperty("qualified_id")
-    public Qualified id;
+    public QualifiedId id;
 
     @JsonProperty
     public Integer status;

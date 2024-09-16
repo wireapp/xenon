@@ -21,7 +21,7 @@ package com.wire.xenon;
 import com.waz.model.Messages;
 import com.wire.xenon.assets.ButtonActionConfirmation;
 import com.wire.xenon.backend.models.NewBot;
-import com.wire.xenon.backend.models.Qualified;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.SystemMessage;
 import com.wire.xenon.models.*;
 import com.wire.xenon.models.otr.PreKey;
@@ -76,7 +76,7 @@ public abstract class MessageHandlerBase {
      * @param status Relation status of the connection request
      * @return TRUE if connection was accepted
      */
-    public boolean onConnectRequest(WireClient client, Qualified from, Qualified to, String status) {
+    public boolean onConnectRequest(WireClient client, QualifiedId from, QualifiedId to, String status) {
         // Bot received connect request, and we want to accept it immediately
         if (status.equals("pending")) {
             try {
@@ -162,7 +162,7 @@ public abstract class MessageHandlerBase {
      * @param userId         User Id for the sender
      * @param genericMessage Generic message as it comes from the BE
      */
-    public void onEvent(WireClient client, Qualified userId, Messages.GenericMessage genericMessage) {
+    public void onEvent(WireClient client, QualifiedId userId, Messages.GenericMessage genericMessage) {
     }
 
     /**
@@ -187,11 +187,11 @@ public abstract class MessageHandlerBase {
 
     }
 
-    public void onNewTeamMember(WireClient userClient, Qualified userId) {
+    public void onNewTeamMember(WireClient userClient, QualifiedId userId) {
 
     }
 
-    public void onUserUpdate(UUID eventId, Qualified userId) {
+    public void onUserUpdate(UUID eventId, QualifiedId userId) {
 
     }
 

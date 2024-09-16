@@ -1,7 +1,7 @@
 package com.wire.xenon.crypto;
 
 import com.wire.bots.cryptobox.CryptoException;
-import com.wire.xenon.backend.models.Qualified;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.models.otr.Missing;
 import com.wire.xenon.models.otr.PreKey;
 import com.wire.xenon.models.otr.PreKeys;
@@ -40,7 +40,7 @@ public interface Crypto extends Closeable {
      * @return Decrypted Base64 encoded string
      * @throws CryptoException throws CryptoException
      */
-    String decrypt(Qualified userId, String clientId, String cypher) throws CryptoException;
+    String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException;
 
     boolean isClosed();
 

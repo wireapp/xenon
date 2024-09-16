@@ -19,7 +19,7 @@
 package com.wire.xenon.models.otr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.wire.xenon.backend.models.Qualified;
+import com.wire.xenon.backend.models.QualifiedId;
 
 import javax.validation.constraints.NotNull;
 
@@ -41,7 +41,7 @@ public class OtrMessage {
         recipients.add(rec);
     }
 
-    public String get(Qualified userId, String clientId) {
+    public String get(QualifiedId userId, String clientId) {
         return recipients.get(userId, clientId);
     }
 

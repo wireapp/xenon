@@ -25,7 +25,7 @@ public abstract class MessageResourceBase {
 
         switch (payload.type) {
             case "conversation.otr-message-add":
-                Qualified from = payload.from;
+                QualifiedId from = payload.from;
 
                 Logger.debug("conversation.otr-message-add: bot: %s from: %s:%s", botId, from, data.sender);
 
@@ -44,7 +44,7 @@ public abstract class MessageResourceBase {
                 Logger.debug("conversation.member-join: bot: %s", botId);
 
                 // Check if this bot got added to the conversation
-                List<Qualified> participants = data.userIds;
+                List<QualifiedId> participants = data.userIds;
                 if (participants.remove(botId)) {
                     SystemMessage systemMessage = getSystemMessage(eventId, payload);
                     systemMessage.conversation = client.getConversation();
@@ -92,7 +92,7 @@ public abstract class MessageResourceBase {
                 systemMessage = getSystemMessage(eventId, payload);
                 if (systemMessage.conversation.members != null) {
                     Member self = new Member();
-                    self.id = new Qualified(botId, null);
+                    self.id = new QualifiedId(botId, null);
                     systemMessage.conversation.members.add(self);
                 }
 
@@ -153,7 +153,7 @@ public abstract class MessageResourceBase {
 
     private Messages.GenericMessage decrypt(WireClient client, Payload payload)
             throws CryptoException, InvalidProtocolBufferException {
-        Qualified from = payload.from;
+        QualifiedId from = payload.from;
         String sender = payload.data.sender;
         String cipher = payload.data.text;
 

@@ -32,7 +32,7 @@ import java.util.ArrayList;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     @JsonProperty("qualified_id")
-    public Qualified id;
+    public QualifiedId id;
 
     @JsonProperty
     public String name;
