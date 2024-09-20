@@ -34,7 +34,7 @@ public interface WireAPI {
 
     AssetKey uploadAsset(IAsset asset) throws Exception;
 
-    byte[] downloadAsset(String assetId, String assetToken) throws HttpException;
+    byte[] downloadAsset(String assetId, String domain, String assetToken) throws HttpException;
 
     boolean deleteConversation(UUID teamId) throws HttpException;
 

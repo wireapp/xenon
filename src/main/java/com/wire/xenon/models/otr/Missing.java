@@ -1,13 +1,14 @@
 package com.wire.xenon.models.otr;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.wire.xenon.backend.models.QualifiedId;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
- * Collection of devices (clients) grouped by owning users.
+ * Collection of devices (clients) grouped by owning users. Users are also grouped by backend domain.
  *
  * <p>
  *     Holds the users and their devices when a message needs to be sent.
@@ -18,22 +19,30 @@ import java.util.concurrent.ConcurrentHashMap;
  *     any clientId, where the backend will respond with the clientId "missing" from the request.
  * </p>
  */
-public class Missing extends ConcurrentHashMap<QualifiedId, Collection<String>> {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Missing extends ConcurrentHashMap<String, ConcurrentHashMap<UUID, Collection<String>>> {
     public Collection<String> toClients(QualifiedId userId) {
-        return get(userId);
+        return get(userId.domain).get(userId.id);
     }
 
     public Collection<QualifiedId> toUserIds() {
-        return keySet();
+        return entrySet().stream()
+            .flatMap(
+                u -> u.getValue()
+                    .keySet()
+                    .stream()
+                    .map(strings -> new QualifiedId(strings, u.getKey()))
+            )
+            .collect(Collectors.toList());
     }
 
     public void add(QualifiedId userId, String clientId) {
-        Collection<String> clients = computeIfAbsent(userId, k -> new ArrayList<>());
-        clients.add(clientId);
+        add(userId, List.of(clientId));
     }
 
     public void add(QualifiedId userId, Collection<String> clients) {
-        Collection<String> old = computeIfAbsent(userId, k -> new ArrayList<>());
-        old.addAll(clients);
+        Map<UUID, Collection<String>> userClientsMap = computeIfAbsent(userId.domain, k -> new ConcurrentHashMap<>());
+        Collection<String> clientsList = userClientsMap.computeIfAbsent(userId.id, k -> new ArrayList<>());
+        clientsList.addAll(clients);
     }
 }

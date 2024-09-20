@@ -41,7 +41,7 @@ public class StatefulEncryptionTest extends DatabaseTestBase {
         String text = "Hello Alice, This is Alice!";
         final MessageText messageText = new MessageText(text);
         PreKeys alice1SendingPrekeys = new PreKeys(alice1PreKeys, client1, aliceId);
-        assert alice1SendingPrekeys.get(aliceId).size() == 1;
+        assert alice1SendingPrekeys.qualifiedUserClientPrekeys.get(aliceId.domain).get(aliceId.id).size() == 1;
         final Recipients encrypted = aliceCrypto.encrypt(alice1SendingPrekeys, messageText.createGenericMsg().toByteArray());
         assert encrypted.size() == 1;
 
