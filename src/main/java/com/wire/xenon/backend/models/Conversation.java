@@ -28,7 +28,7 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Conversation {
-    @JsonProperty("qualified_conversation")
+    @JsonProperty("qualified_id")
     public QualifiedId id;
 
     @JsonProperty

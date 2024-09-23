@@ -219,11 +219,6 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public UUID getTeam() throws HttpException {
-        return api.getTeam();
-    }
-
-    @Override
     public Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException {
         return api.createConversation(name, teamId, users);
     }
@@ -239,8 +234,8 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public Conversation addParticipants(QualifiedId... userIds) throws HttpException {
-        return api.addParticipants(userIds);
+    public void addParticipants(QualifiedId... userIds) throws HttpException {
+        api.addParticipants(userIds);
     }
 
     @Override

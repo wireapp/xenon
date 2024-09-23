@@ -40,7 +40,7 @@ public interface WireAPI {
 
     void addService(UUID serviceId, UUID providerId) throws HttpException;
 
-    Conversation addParticipants(QualifiedId... userIds) throws HttpException;
+    void addParticipants(QualifiedId... userIds) throws HttpException;
 
     Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException;
 
@@ -50,13 +50,7 @@ public interface WireAPI {
 
     User getUser(QualifiedId userId) throws HttpException;
 
-    QualifiedId getUserId(String handle) throws HttpException;
-
     boolean hasDevice(QualifiedId userId, String clientId);
-
-    UUID getTeam() throws HttpException;
-
-    Collection<QualifiedId> getTeamMembers(UUID teamId);
 
     void acceptConnection(QualifiedId user) throws Exception;
 }

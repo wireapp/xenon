@@ -203,15 +203,13 @@ public interface WireClient extends Closeable {
      */
     AssetKey uploadAsset(IAsset asset) throws Exception;
 
-    UUID getTeam() throws HttpException;
-
     Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException;
 
     Conversation createOne2One(UUID teamId, QualifiedId userId) throws HttpException;
 
     void leaveConversation(QualifiedId userId) throws HttpException;
 
-    Conversation addParticipants(QualifiedId... userIds) throws HttpException;
+    void addParticipants(QualifiedId... userIds) throws HttpException;
 
     void addService(UUID serviceId, UUID providerId) throws HttpException;
 
