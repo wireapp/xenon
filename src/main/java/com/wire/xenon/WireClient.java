@@ -59,13 +59,14 @@ public interface WireClient extends Closeable {
      * This method downloads asset from the Backend.
      *
      * @param assetKey        Unique asset identifier (String)
+     * @param domain          Domain of the backend hosting the resource (String)
      * @param assetToken      Asset token (null in case of public assets)
      * @param sha256Challenge SHA256 hash code for this asset
      * @param otrKey          Encryption key to be used to decrypt the data
      * @return Decrypted asset data
      * @throws Exception
      */
-    byte[] downloadAsset(String assetKey, String assetToken, byte[] sha256Challenge, byte[] otrKey) throws Exception;
+    byte[] downloadAsset(String assetKey, String domain, String assetToken, byte[] sha256Challenge, byte[] otrKey) throws Exception;
 
     /**
      * @return Bot ID as UUID
@@ -186,11 +187,12 @@ public interface WireClient extends Closeable {
     /**
      * Download publicly available profile picture for the given asset key. This asset is not encrypted
      *
-     * @param assetKey Asset key
+     * @param assetKey Unique asset identifier (String)
+     * @param domain   Domain of the backend hosting the resource (String)
      * @return Profile picture binary data
      * @throws Exception
      */
-    byte[] downloadProfilePicture(String assetKey) throws Exception;
+    byte[] downloadProfilePicture(String assetKey, String domain) throws Exception;
 
     /**
      * Uploads assert to backend. This method is used in conjunction with sendPicture(IGeneric)
@@ -201,15 +203,13 @@ public interface WireClient extends Closeable {
      */
     AssetKey uploadAsset(IAsset asset) throws Exception;
 
-    UUID getTeam() throws HttpException;
-
     Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException;
 
     Conversation createOne2One(UUID teamId, QualifiedId userId) throws HttpException;
 
     void leaveConversation(QualifiedId userId) throws HttpException;
 
-    Conversation addParticipants(QualifiedId... userIds) throws HttpException;
+    void addParticipants(QualifiedId... userIds) throws HttpException;
 
     void addService(UUID serviceId, UUID providerId) throws HttpException;
 

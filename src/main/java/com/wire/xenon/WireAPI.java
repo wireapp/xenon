@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface WireAPI {
-    Devices sendMessage(OtrMessage msg, Object... ignoreMissing) throws HttpException;
+    Devices sendMessage(OtrMessage msg, boolean ignoreMissing) throws HttpException;
 
     Devices sendPartialMessage(OtrMessage msg, QualifiedId userId) throws HttpException;
 
@@ -34,13 +34,13 @@ public interface WireAPI {
 
     AssetKey uploadAsset(IAsset asset) throws Exception;
 
-    byte[] downloadAsset(String assetId, String assetToken) throws HttpException;
+    byte[] downloadAsset(String assetId, String domain, String assetToken) throws HttpException;
 
     boolean deleteConversation(UUID teamId) throws HttpException;
 
     void addService(UUID serviceId, UUID providerId) throws HttpException;
 
-    Conversation addParticipants(QualifiedId... userIds) throws HttpException;
+    void addParticipants(QualifiedId... userIds) throws HttpException;
 
     Conversation createConversation(String name, UUID teamId, List<QualifiedId> users) throws HttpException;
 
@@ -50,13 +50,7 @@ public interface WireAPI {
 
     User getUser(QualifiedId userId) throws HttpException;
 
-    QualifiedId getUserId(String handle) throws HttpException;
-
     boolean hasDevice(QualifiedId userId, String clientId);
-
-    UUID getTeam() throws HttpException;
-
-    Collection<QualifiedId> getTeamMembers(UUID teamId);
 
     void acceptConnection(QualifiedId user) throws Exception;
 }

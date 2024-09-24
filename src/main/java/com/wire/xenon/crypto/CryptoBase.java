@@ -28,7 +28,8 @@ import com.wire.xenon.models.otr.Recipients;
 
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Wrapper for the Crypto Box. This class is thread safe.
@@ -116,15 +117,19 @@ abstract class CryptoBase implements Crypto {
     @Override
     public Recipients encrypt(PreKeys preKeys, byte[] content) throws CryptoException {
         Recipients recipients = new Recipients();
-        for (QualifiedId userId : preKeys.keySet()) {
-            HashMap<String, PreKey> clients = preKeys.get(userId);
-            for (String clientId : clients.keySet()) {
-                PreKey pk = clients.get(clientId);
-                if (pk != null && pk.key != null) {
-                    String id = createId(userId, clientId);
-                    byte[] cipher = box().encryptFromPreKeys(id, toPreKey(pk), content);
-                    String s = Base64.getEncoder().encodeToString(cipher);
-                    recipients.add(userId, clientId, s);
+        for (String domain : preKeys.qualifiedUserClientPrekeys.keySet()) {
+            Map<UUID, Map<String, PreKey>> users = preKeys.qualifiedUserClientPrekeys.get(domain);
+            for (UUID user : users.keySet()) {
+                Map<String, PreKey> clients = users.get(user);
+                for (String clientId : clients.keySet()) {
+                    PreKey pk = clients.get(clientId);
+                    if (pk != null && pk.key != null) {
+                        QualifiedId qualifiedUserId = new QualifiedId(user, domain);
+                        String id = createId(qualifiedUserId, clientId);
+                        byte[] cipher = box().encryptFromPreKeys(id, toPreKey(pk), content);
+                        String s = Base64.getEncoder().encodeToString(cipher);
+                        recipients.add(qualifiedUserId, clientId, s);
+                    }
                 }
             }
         }

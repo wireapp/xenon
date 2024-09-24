@@ -1,6 +1,7 @@
 # Xenon
 
-Wire Bots base library.
+Wire JVM base library.
+
 This library defines how JVM based clients should interacts with cryptographic sessions.
 While the underlying cryptobox4j just defines the operations possible on a local crypto session,
 Xenon adds an abstraction to send-receive messages, taking care of pre-keys renewal, edge-cases and errors.

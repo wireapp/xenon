@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Devices {
@@ -34,14 +36,23 @@ public class Devices {
     @JsonProperty
     public final Missing deleted = new Missing();
 
+    @JsonProperty("failed_to_confirm_clients")
+    public final Missing failedToConfirmClients = new Missing();
+
+    @JsonProperty("failed_to_send")
+    public final Missing failedToSend = new Missing();
+
     public boolean hasMissing() {
         return missing.isEmpty();
     }
 
     public int size() {
         int ret = 0;
-        for (Collection<String> cls : missing.values())
-            ret += cls.size();
+        for (ConcurrentHashMap<UUID, Collection<String>> users : missing.values()) {
+            for (Collection<String> clients : users.values()) {
+                ret += clients.size();
+            }
+        }
         return ret;
     }
 }

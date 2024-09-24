@@ -23,9 +23,8 @@ public class WireClientBase implements WireClient {
     protected final Crypto crypto;
     protected final NewBot state;
     protected Devices devices = null;
-    private String apiServerDomain;
 
-    protected WireClientBase(WireAPI api, Crypto crypto, NewBot state) {
+    public WireClientBase(WireAPI api, Crypto crypto, NewBot state) {
         this.api = api;
         this.crypto = crypto;
         this.state = state;
@@ -180,8 +179,8 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public byte[] downloadProfilePicture(String assetKey) throws HttpException {
-        return api.downloadAsset(assetKey, null);
+    public byte[] downloadProfilePicture(String assetKey, String domain) throws HttpException {
+        return api.downloadAsset(assetKey, domain, null);
     }
 
     @Override
@@ -209,19 +208,14 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public byte[] downloadAsset(String assetId, String assetToken, byte[] sha256Challenge, byte[] otrKey)
+    public byte[] downloadAsset(String assetId, String domain, String assetToken, byte[] sha256Challenge, byte[] otrKey)
             throws Exception {
-        byte[] cipher = api.downloadAsset(assetId, assetToken);
+        byte[] cipher = api.downloadAsset(assetId, domain, assetToken);
         byte[] sha256 = MessageDigest.getInstance("SHA-256").digest(cipher);
         if (!Arrays.equals(sha256, sha256Challenge))
             throw new Exception("Failed sha256 check");
 
         return Util.decrypt(otrKey, cipher);
-    }
-
-    @Override
-    public UUID getTeam() throws HttpException {
-        return api.getTeam();
     }
 
     @Override
@@ -240,8 +234,8 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public Conversation addParticipants(QualifiedId... userIds) throws HttpException {
-        return api.addParticipants(userIds);
+    public void addParticipants(QualifiedId... userIds) throws HttpException {
+        api.addParticipants(userIds);
     }
 
     @Override
@@ -268,7 +262,7 @@ public class WireClientBase implements WireClient {
         if (devices == null || devices.hasMissing()) {
             String deviceId = getDeviceId();
             OtrMessage msg = new OtrMessage(deviceId, new Recipients());
-            devices = api.sendMessage(msg);
+            devices = api.sendMessage(msg, false);
         }
         return devices != null ? devices : new Devices();
     }

@@ -18,33 +18,43 @@
 
 package com.wire.xenon.models.otr;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wire.xenon.backend.models.QualifiedId;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Structure holding qualified users and a Prekey for each of their clients.
- *
  */
-public class PreKeys extends HashMap<QualifiedId, HashMap<String, PreKey>> {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class PreKeys {
     public PreKeys() {
     }
 
-    public PreKeys(ArrayList<PreKey> array, String clientId, QualifiedId userId) {
-        super();
+    @JsonProperty("failed_to_list")
+    public final List<QualifiedId> failedToList = new ArrayList<>();
 
-        HashMap<String, PreKey> devs = new HashMap<>();
+    @JsonProperty("qualified_user_client_prekeys")
+    public final Map<String, Map<UUID, Map<String, PreKey>>> qualifiedUserClientPrekeys = new HashMap<>();
+
+    public PreKeys(ArrayList<PreKey> array, String clientId, QualifiedId userId) {
+        Map<String, PreKey> devs = new HashMap<>();
         for (PreKey key : array) {
             devs.put(clientId, key);
         }
-        put(userId, devs);
+        Map<UUID, Map<String, PreKey>> users = new HashMap<>();
+        users.put(userId.id, devs);
+        qualifiedUserClientPrekeys.put(userId.domain, users);
     }
 
     public int count() {
         int ret = 0;
-        for (HashMap<String, PreKey> cls : values())
-            ret += cls.size();
+        for (Map<UUID, Map<String, PreKey>> domain : qualifiedUserClientPrekeys.values()) {
+            for (Map<String, PreKey> user : domain.values()) {
+                ret += user.size();
+            }
+        }
         return ret;
     }
 }

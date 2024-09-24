@@ -1,0 +1,3 @@
+[submodule "generic-message-proto"]
+	path = generic-message-proto
+	url = git@github.com:wireapp/generic-message-proto.git
