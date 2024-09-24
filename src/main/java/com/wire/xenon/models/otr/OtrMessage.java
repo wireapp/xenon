@@ -56,4 +56,8 @@ public class OtrMessage {
     public String getSender() {
         return sender;
     }
+
+    public Recipients getRecipients() {
+        return recipients;
+    }
 }
