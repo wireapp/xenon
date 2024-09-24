@@ -3,10 +3,7 @@ package com.wire.xenon.models.otr;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.wire.xenon.backend.models.QualifiedId;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -45,6 +42,10 @@ public class Missing extends ConcurrentHashMap<String, ConcurrentHashMap<UUID, C
 
     public void add(QualifiedId userId, Collection<String> clients) {
         Map<UUID, Collection<String>> userClientsMap = computeIfAbsent(userId.domain, k -> new ConcurrentHashMap<>());
-        userClientsMap.put(userId.id, clients);
+        userClientsMap.merge(userId.id, clients, (l1, l2) -> {
+            Collection<String> all = new ArrayList<>(l1);
+            all.addAll(l2);
+            return all;
+        });
     }
 }
