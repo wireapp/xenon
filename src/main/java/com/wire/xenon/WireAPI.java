@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface WireAPI {
-    Devices sendMessage(OtrMessage msg, Object... ignoreMissing) throws HttpException;
+    Devices sendMessage(OtrMessage msg, boolean ignoreMissing) throws HttpException;
 
     Devices sendPartialMessage(OtrMessage msg, QualifiedId userId) throws HttpException;
 

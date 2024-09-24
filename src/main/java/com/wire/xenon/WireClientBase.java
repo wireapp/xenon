@@ -262,7 +262,7 @@ public class WireClientBase implements WireClient {
         if (devices == null || devices.hasMissing()) {
             String deviceId = getDeviceId();
             OtrMessage msg = new OtrMessage(deviceId, new Recipients());
-            devices = api.sendMessage(msg);
+            devices = api.sendMessage(msg, false);
         }
         return devices != null ? devices : new Devices();
     }
