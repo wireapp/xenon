@@ -6,7 +6,7 @@
 
     <groupId>com.wire</groupId>
     <artifactId>xenon</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.2</version>
 
     <name>Xenon</name>
     <description>Base Wire Bots Library</description>

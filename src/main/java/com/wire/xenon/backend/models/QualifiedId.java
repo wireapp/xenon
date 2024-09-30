@@ -54,7 +54,7 @@ public class QualifiedId {
         public QualifiedId deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
             JsonNode node = jp.getCodec().readTree(jp);
             if (node.has("id") && node.has("domain")) {
-                UUID id = UUID.fromString(node.get("name").asText());
+                UUID id = UUID.fromString(node.get("id").asText());
                 String domain = node.get("domain").asText();
                 return new QualifiedId(id, domain);
             } else if (node.isTextual()) {
