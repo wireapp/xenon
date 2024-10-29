@@ -8,6 +8,7 @@ import com.wire.xenon.backend.models.NewBot;
 import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.User;
 import com.wire.xenon.crypto.Crypto;
+import com.wire.xenon.crypto.mls.CryptoMlsClient;
 import com.wire.xenon.exceptions.HttpException;
 import com.wire.xenon.models.AssetKey;
 import com.wire.xenon.models.otr.*;
@@ -21,12 +22,14 @@ import java.util.*;
 public class WireClientBase implements WireClient {
     protected final WireAPI api;
     protected final Crypto crypto;
+    protected final CryptoMlsClient cryptoMlsClient;
     protected final NewBot state;
     protected Devices devices = null;
 
-    public WireClientBase(WireAPI api, Crypto crypto, NewBot state) {
+    public WireClientBase(WireAPI api, Crypto crypto, CryptoMlsClient cryptoMlsClient, NewBot state) {
         this.api = api;
         this.crypto = crypto;
+        this.cryptoMlsClient = cryptoMlsClient;
         this.state = state;
     }
 
@@ -58,15 +61,17 @@ public class WireClientBase implements WireClient {
     @Override
     public void close() throws IOException {
         crypto.close();
+        cryptoMlsClient.close();
     }
 
     @Override
     public boolean isClosed() {
+        // This method is unused, no need to add Core-Crypto handling.
         return crypto.isClosed();
     }
 
     /**
-     * Encrypt whole message for participants in the conversation.
+     * Encrypt whole message for participants in the Proteus conversation.
      * Implements the fallback for the 412 error code and missing
      * devices.
      *
@@ -103,8 +108,14 @@ public class WireClientBase implements WireClient {
         }
     }
 
+    /**
+     * Encrypt and send message to a specific user. Proteus only,.
+     * @param userId the user to send the message to
+     * @param generic generic message to be sent
+     * @throws Exception CryptoBox exception
+     */
     protected void postGenericMessage(IGeneric generic, QualifiedId userId) throws Exception {
-        // Try to encrypt the msg for those devices that we have the session already
+        // Try to encrypt the msg for those devices that we have the Proteus session already
         Missing all = getAllDevices();
         Missing missing = new Missing();
         for (QualifiedId u : all.toUserIds()) {
@@ -193,8 +204,13 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException {
+    public String decryptProteus(QualifiedId userId, String clientId, String cypher) throws CryptoException {
         return crypto.decrypt(userId, clientId, cypher);
+    }
+
+    @Override
+    public byte[] decryptMls(String mlsGroupId, String cypher) {
+        return cryptoMlsClient.decrypt(mlsGroupId, cypher);
     }
 
     @Override

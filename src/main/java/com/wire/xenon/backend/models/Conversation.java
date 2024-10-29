@@ -18,6 +18,7 @@
 
 package com.wire.xenon.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,14 +30,27 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Conversation {
     @JsonProperty("qualified_id")
+    @JsonAlias("qualified_conversation")
     public QualifiedId id;
 
     @JsonProperty
     public String name;
+
+    @JsonProperty("mls_group_id")
+    public String mlsGroupId;
+
+    @JsonProperty
+    public Protocol protocol;
 
     @JsonProperty
     public UUID creator;
     
     @JsonProperty
     public List<Member> members;
+
+    public enum Protocol {
+        @JsonProperty("proteus") PROTEUS,
+        @JsonProperty("mls") MLS,
+        @JsonProperty("mized") MIXED
+    }
 }

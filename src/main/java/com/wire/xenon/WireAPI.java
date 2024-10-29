@@ -32,6 +32,8 @@ public interface WireAPI {
 
     void uploadPreKeys(ArrayList<PreKey> preKeys) throws IOException;
 
+    //TODO add MLS apis, getAllConversations, publish keypackage and mls_public_key
+
     AssetKey uploadAsset(IAsset asset) throws Exception;
 
     byte[] downloadAsset(String assetId, String domain, String assetToken) throws HttpException;

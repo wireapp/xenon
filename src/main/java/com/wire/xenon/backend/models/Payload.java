@@ -20,8 +20,14 @@ package com.wire.xenon.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +51,7 @@ public class Payload {
     public String time;
 
     @JsonProperty
+    @JsonDeserialize(using = Data.Deserializer.class)
     public Data data;
 
     @JsonProperty
@@ -77,6 +84,39 @@ public class Payload {
         public UUID creator;
         @JsonProperty
         public Members members;
+
+        /**
+         * Custom deserializer to handle Payload.Data being either a string value or an object.
+         *
+         * <p>
+         *     When getting notification events, most of them will have something inside the "data" field.
+         *     On receiving a MLS message, "data" will be a string value, while in all other cases "data" will
+         *     be deserialized as an object.
+         * </p>
+         */
+        public static class Deserializer extends StdDeserializer<Data> {
+            public Deserializer() {
+                this(null);
+            }
+
+            Deserializer(Class<?> vc) {
+                super(vc);
+            }
+
+            @Override
+            public Data deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+                JsonNode node = jp.getCodec().readTree(jp);
+                if (node.isObject()) {
+                    return jp.readValueAs(Data.class);
+                } else if (node.isTextual()) {
+                    Data data = new Data();
+                    data.text = node.asText();
+                    return data;
+                } else {
+                    throw new RuntimeException("Unable to parse Data as object or string");
+                }
+            }
+        }
     }
 
     // User Mode

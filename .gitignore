@@ -2,6 +2,7 @@
 ### Java template
 
 .idea/
+!.idea/icon.png
 *.iml
 target/
 data/
