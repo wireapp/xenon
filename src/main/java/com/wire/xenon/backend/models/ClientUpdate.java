@@ -18,39 +18,26 @@
 
 package com.wire.xenon.backend.models;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-import java.util.UUID;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Conversation {
-    @JsonProperty("qualified_id")
-    @JsonAlias("qualified_conversation")
-    public QualifiedId id;
+public class ClientUpdate {
+    @JsonProperty("mls_public_keys")
+    public MlsPublicKeys mlsPublicKeys;
 
-    @JsonProperty
-    public String name;
-
-    @JsonProperty("mls_group_id")
-    public String mlsGroupId;
-
-    @JsonProperty
-    public Protocol protocol;
-
-    @JsonProperty
-    public UUID creator;
-    
-    @JsonProperty
-    public List<Member> members;
-
-    public enum Protocol {
-        @JsonProperty("proteus") PROTEUS,
-        @JsonProperty("mls") MLS,
-        @JsonProperty("mixed") MIXED
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class MlsPublicKeys {
+        @JsonProperty("ecdsa_secp256r1_sha256")
+        public String ecdsaSecp256r1Sha256;
+        @JsonProperty("ecdsa_secp256r1_sha384")
+        public String ecdsaSecp256r1Sha384;
+        @JsonProperty("ecdsa_secp256r1_sha512")
+        public String ecdsaSecp256r1Sha512;
+        @JsonProperty("ed25519")
+        public String ed25519;
     }
 }

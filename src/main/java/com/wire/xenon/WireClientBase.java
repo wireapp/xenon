@@ -8,7 +8,7 @@ import com.wire.xenon.backend.models.NewBot;
 import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.User;
 import com.wire.xenon.crypto.Crypto;
-import com.wire.xenon.crypto.mls.CryptoMlsClient;
+import com.wire.xenon.crypto.CryptoMlsClient;
 import com.wire.xenon.exceptions.HttpException;
 import com.wire.xenon.models.AssetKey;
 import com.wire.xenon.models.otr.*;

@@ -1,10 +1,11 @@
-package com.wire.xenon.crypto.mls
+package com.wire.xenon.crypto
 
 import com.wire.crypto.client.ClientId
 import com.wire.crypto.client.CoreCryptoCentral
 import com.wire.crypto.client.MLSClient
 import com.wire.crypto.client.MLSGroupId
 import com.wire.crypto.client.MlsMessage
+import com.wire.crypto.client.Welcome
 import kotlinx.coroutines.runBlocking
 import java.io.Closeable
 import java.util.*
@@ -33,6 +34,18 @@ class CryptoMlsClient : Closeable {
         val encryptedMessageBytes: ByteArray = Base64.getDecoder().decode(encryptedMessage)
         val decryptedMessage = runBlocking { mlsClient.decryptMessage(MLSGroupId(mlsGroupIdBytes), MlsMessage(encryptedMessageBytes)) }
         return decryptedMessage.message
+    }
+
+    // TODO handle conversation marked as complete, after both welcomeMessage and member-join events have been received
+    // https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/563053166/Use+case+being+added+to+a+conversation+MLS
+    fun welcomeMessage(welcome: ByteArray): ByteArray? {
+        val welcomeBundle = runBlocking { mlsClient.processWelcomeMessage(Welcome(welcome)) }
+        return welcomeBundle.id.value
+    }
+
+    fun validKeyPackageCount(): Long {
+        val decryptedMessage = runBlocking { mlsClient.validKeyPackageCount() }
+        return decryptedMessage.toLong()
     }
 
     override fun close() {
