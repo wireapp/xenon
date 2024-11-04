@@ -1,4 +1,4 @@
-package com.wire.xenon.crypto
+package com.wire.xenon.crypto.mls
 
 import com.wire.crypto.client.ClientId
 import com.wire.crypto.client.CoreCryptoCentral

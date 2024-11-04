@@ -6,7 +6,7 @@
 
     <groupId>com.wire</groupId>
     <artifactId>xenon</artifactId>
-    <version>1.6.2</version>
+    <version>1.6.3</version>
 
     <name>Xenon</name>
     <description>Base Wire Bots Library</description>
@@ -195,14 +195,14 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>1.9.20</version>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <phase>pre-site</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>javadocJar</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -34,8 +34,6 @@ public interface WireAPI {
 
     void uploadPreKeys(ArrayList<PreKey> preKeys) throws IOException;
 
-    //TODO add MLS apis, getAllConversations, publish keypackage and mls_public_key
-
     AssetKey uploadAsset(IAsset asset) throws Exception;
 
     byte[] downloadAsset(String assetId, String domain, String assetToken) throws HttpException;
@@ -63,4 +61,8 @@ public interface WireAPI {
     void uploadClientPublicKey(String clientId, ClientUpdate clientUpdate); // Calls PUT /clients/{clientId}
 
     void uploadClientKeyPackages(String clientId, KeyPackageUpdate keyPackageUpdate); // Calls POST /mls/key-packages/self{client}
+
+    byte[] getConversationGroupInfo(); // Calls GET /conversations/{cnv_domain}/{cnv}/groupinfo returns a response with type message/mls, should be returned as byte array
+
+    void commitMlsBundle(byte[] commitBundle); // Calls POST /mls/commit-bundles, we care only if it is successful, no need to return anything
 }
