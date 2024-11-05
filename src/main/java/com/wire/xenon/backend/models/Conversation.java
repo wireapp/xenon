@@ -37,6 +37,7 @@ public class Conversation {
     public String name;
 
     @JsonProperty("mls_group_id")
+    @JsonAlias("group_id")
     public String mlsGroupId;
 
     @JsonProperty

@@ -3,10 +3,8 @@ package com.wire.xenon;
 import com.wire.bots.cryptobox.CryptoException;
 import com.wire.xenon.assets.IAsset;
 import com.wire.xenon.assets.IGeneric;
-import com.wire.xenon.backend.models.Conversation;
-import com.wire.xenon.backend.models.NewBot;
-import com.wire.xenon.backend.models.QualifiedId;
-import com.wire.xenon.backend.models.User;
+import com.wire.xenon.backend.KeyPackageUpdate;
+import com.wire.xenon.backend.models.*;
 import com.wire.xenon.crypto.Crypto;
 import com.wire.xenon.crypto.mls.CryptoMlsClient;
 import com.wire.xenon.exceptions.HttpException;
@@ -211,6 +209,36 @@ public class WireClientBase implements WireClient {
     @Override
     public byte[] decryptMls(String mlsGroupId, String cypher) {
         return cryptoMlsClient.decrypt(mlsGroupId, cypher);
+    }
+
+    @Override
+    public void updateClientWithMlsPublicKey() {
+        final byte[] publicKey = cryptoMlsClient.getPublicKey();
+        ClientUpdate.MlsPublicKeys mlsPublicKeys = new ClientUpdate.MlsPublicKeys();
+        mlsPublicKeys.ed25519 = Base64.getEncoder().encodeToString(publicKey);
+        ClientUpdate clientUpdate = new ClientUpdate();
+        clientUpdate.mlsPublicKeys = mlsPublicKeys;
+
+        api.uploadClientPublicKey(cryptoMlsClient.getId(), clientUpdate);
+    }
+
+    @Override
+    public void uploadMlsKeyPackages(int keyPackageAmount) {
+        final List<byte[]> keyPackages = cryptoMlsClient.generateKeyPackages(keyPackageAmount);
+        KeyPackageUpdate keyPackageUpdate = new KeyPackageUpdate();
+        keyPackageUpdate.keyPackages = keyPackages.stream().map(Base64.getEncoder()::encodeToString).toList();
+
+        api.uploadClientKeyPackages(cryptoMlsClient.getId(), keyPackageUpdate);
+    }
+
+    @Override
+    public void joinMlsConversation(QualifiedId conversationId, String mlsGroupId) {
+        final byte[] conversationGroupInfo = api.getConversationGroupInfo(conversationId);
+        final byte[] commitBundle = cryptoMlsClient.createJoinConversationRequest(conversationGroupInfo);
+        api.commitMlsBundle(commitBundle);
+        // TODO some error recovery
+
+        cryptoMlsClient.markConversationAsJoined(mlsGroupId);
     }
 
     @Override

@@ -152,6 +152,27 @@ public interface WireClient extends Closeable {
     byte[] decryptMls(String mlsGroupId, String cypher);
 
     /**
+     * Fetch the default public key (SHA256) of the initialized MLS client and upload it to the backend
+     */
+    void updateClientWithMlsPublicKey();
+
+    /**
+     * Generate (or fetch if available) a specified amount of MLS KeyPackages and upload them to the backend
+     *
+     * @param keyPackageAmount the amount of key packages to generate and upload
+     */
+    void uploadMlsKeyPackages(int keyPackageAmount);
+
+    /**
+     * Ask the backend for this device to join the specified MLS conversation.
+     * THe MLS data for the client needs to be already established and present in the backend.
+     * If accepted, the conversation will be marked as joined on the backend and locally in core-crypto storage.
+     *
+     * @param conversationId the conversation to join
+     */
+    void joinMlsConversation(QualifiedId conversationId, String mlsGroupId);
+
+    /**
      * Invoked by the sdk. Called once when the conversation is created
      *
      * @return Last prekey
