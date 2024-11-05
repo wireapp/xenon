@@ -1,6 +1,7 @@
 package com.wire.xenon.crypto.mls
 
 import com.wire.crypto.client.ClientId
+import com.wire.crypto.client.CommitBundle
 import com.wire.crypto.client.CoreCryptoCentral
 import com.wire.crypto.client.GroupInfo
 import com.wire.crypto.client.MLSClient
@@ -66,8 +67,18 @@ class CryptoMlsClient : Closeable {
 
     fun createJoinConversationRequest(groupInfo: ByteArray): ByteArray {
         val commitBundle = runBlocking { mlsClient.joinByExternalCommit(GroupInfo(groupInfo)) }
-        // TODO serialize commitBundle by doing a sum of its bytearray fields
-        return groupInfo
+        return parseBundleIntoSingleByteArray(commitBundle)
+    }
+
+    /**
+     * Return the CommitBundle data as a single byte array, in a specific order.
+     * The order is: commit, groupInfoBundle, welcome (optional).
+     * The created bundle will be pushed in this format to the backend to request joining a conversation.
+     *
+     * @param bundle the CommitBundle to parse
+     */
+    private fun parseBundleIntoSingleByteArray(bundle: CommitBundle): ByteArray {
+        return bundle.commit.value + bundle.groupInfoBundle.payload.value + (bundle.welcome?.value ?: ByteArray(0))
     }
 
     fun markConversationAsJoined(mlsGroupId: String) {

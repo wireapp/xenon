@@ -169,6 +169,7 @@ public interface WireClient extends Closeable {
      * If accepted, the conversation will be marked as joined on the backend and locally in core-crypto storage.
      *
      * @param conversationId the conversation to join
+     * @param mlsGroupId the MLS groupId of the conversation to join
      */
     void joinMlsConversation(QualifiedId conversationId, String mlsGroupId);
 

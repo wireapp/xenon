@@ -33,10 +33,10 @@ public class ClientUpdate {
     public static class MlsPublicKeys {
         @JsonProperty("ecdsa_secp256r1_sha256")
         public String ecdsaSecp256r1Sha256;
-        @JsonProperty("ecdsa_secp256r1_sha384")
-        public String ecdsaSecp256r1Sha384;
-        @JsonProperty("ecdsa_secp256r1_sha512")
-        public String ecdsaSecp256r1Sha512;
+        @JsonProperty("ecdsa_secp384r1_sha384")
+        public String ecdsaSecp384r1Sha384;
+        @JsonProperty("ecdsa_secp512r1_sha512")
+        public String ecdsaSecp512r1Sha512;
         @JsonProperty("ed25519")
         public String ed25519;
     }

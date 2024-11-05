@@ -60,7 +60,7 @@ public interface WireAPI {
 
     void uploadClientPublicKey(String clientId, ClientUpdate clientUpdate); // Calls PUT /clients/{clientId}
 
-    void uploadClientKeyPackages(String clientId, KeyPackageUpdate keyPackageUpdate); // Calls POST /mls/key-packages/self{client}
+    void uploadClientKeyPackages(String clientId, KeyPackageUpdate keyPackageUpdate); // Calls POST /mls/key-packages/self/{client}
 
     byte[] getConversationGroupInfo(QualifiedId conversationId); // Calls GET /conversations/{cnv_domain}/{cnv}/groupinfo returns a response with type message/mls, should be returned as byte array
 
