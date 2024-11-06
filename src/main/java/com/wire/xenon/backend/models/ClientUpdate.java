@@ -35,8 +35,8 @@ public class ClientUpdate {
         public String ecdsaSecp256r1Sha256;
         @JsonProperty("ecdsa_secp384r1_sha384")
         public String ecdsaSecp384r1Sha384;
-        @JsonProperty("ecdsa_secp512r1_sha512")
-        public String ecdsaSecp512r1Sha512;
+        @JsonProperty("ecdsa_secp521r1_sha512")
+        public String ecdsaSecp521r1Sha512;
         @JsonProperty("ed25519")
         public String ed25519;
     }

@@ -7,6 +7,7 @@ import com.wire.crypto.client.GroupInfo
 import com.wire.crypto.client.MLSClient
 import com.wire.crypto.client.MLSGroupId
 import com.wire.crypto.client.MlsMessage
+import com.wire.crypto.client.PlaintextMessage
 import com.wire.crypto.client.Welcome
 import kotlinx.coroutines.runBlocking
 import java.io.Closeable
@@ -28,9 +29,16 @@ class CryptoMlsClient : Closeable {
     }
 
     fun getId(): String = clientId
+    fun getCoreCryptoClient(): MLSClient = mlsClient
 
     private fun getDirectoryPath(clientId: String): String {
         return "mls/$clientId"
+    }
+
+    fun encrypt(mlsGroupId: String, plainMessage: ByteArray): ByteArray? {
+        val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
+        val encryptedMessage = runBlocking { mlsClient.encryptMessage(MLSGroupId(mlsGroupIdBytes), PlaintextMessage(plainMessage)) }
+        return encryptedMessage.value
     }
 
     // Group id needs to be fetched by API given qualified id of the conversation or maybe also create a cache/table, then take base64 string and byte array
