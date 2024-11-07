@@ -114,7 +114,7 @@ public abstract class MessageResourceBase {
                         selfDomain = systemMessage.conversation.id.domain;
                     }
                     self.id = new QualifiedId(botId, selfDomain);
-                    systemMessage.conversation.members.add(self);
+                    systemMessage.conversation.members.others.add(self);
                 }
 
                 handler.onNewConversation(client, systemMessage);
@@ -166,7 +166,8 @@ public abstract class MessageResourceBase {
             systemMessage.conversation.creator = payload.data.creator;
             systemMessage.conversation.name = payload.data.name;
             if (payload.data.members != null)
-                systemMessage.conversation.members = payload.data.members.others;
+                systemMessage.conversation.members = new Payload.Members();
+                systemMessage.conversation.members.others = payload.data.members.others;
         }
 
         return systemMessage;

@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import java.util.List;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -47,7 +47,8 @@ public class Conversation {
     public UUID creator;
     
     @JsonProperty
-    public List<Member> members;
+    @JsonDeserialize(using = Payload.Members.Deserializer.class)
+    public Payload.Members members;
 
     public enum Protocol {
         @JsonProperty("proteus") PROTEUS,
