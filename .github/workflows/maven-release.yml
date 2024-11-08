@@ -61,9 +61,6 @@ jobs:
       - name: Build with Maven
         run: mvn -DskipTests package
 
-      - name: Generate Javadoc
-        run: mvn -DskipTests site
-
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v3
         with: # running setup-java again overwrites the settings.xml
