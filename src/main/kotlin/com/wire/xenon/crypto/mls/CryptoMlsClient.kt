@@ -6,6 +6,7 @@ import com.wire.crypto.client.CoreCryptoCentral
 import com.wire.crypto.client.GroupInfo
 import com.wire.crypto.client.MLSClient
 import com.wire.crypto.client.MLSGroupId
+import com.wire.crypto.client.MLSKeyPackage
 import com.wire.crypto.client.MlsMessage
 import com.wire.crypto.client.PlaintextMessage
 import com.wire.crypto.client.Welcome
@@ -63,6 +64,9 @@ class CryptoMlsClient : Closeable {
     // TODO handle conversation marked as complete, after both welcomeMessage and member-join events have been received,
     // TODO remember checking there are enough key packages
     // https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/563053166/Use+case+being+added+to+a+conversation+MLS
+    /**
+     * Process a welcome message, adding this client to a conversation, and return the group id.
+     */
     fun welcomeMessage(welcome: ByteArray): ByteArray {
         val welcomeBundle = runBlocking { mlsClient.processWelcomeMessage(Welcome(welcome)) }
         return welcomeBundle.id.value
@@ -73,6 +77,10 @@ class CryptoMlsClient : Closeable {
         return packageCount.toLong()
     }
 
+    /**
+     * Create a request to join a conversation.
+     * Needs to be followed by a call to markConversationAsJoined() to complete the process.
+     */
     fun createJoinConversationRequest(groupInfo: ByteArray): ByteArray {
         val commitBundle = runBlocking { mlsClient.joinByExternalCommit(GroupInfo(groupInfo)) }
         return parseBundleIntoSingleByteArray(commitBundle)
@@ -93,6 +101,22 @@ class CryptoMlsClient : Closeable {
         val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
         val commitBundle = runBlocking { mlsClient.mergePendingGroupFromExternalCommit(MLSGroupId(mlsGroupIdBytes)) }
         // TODO support the possibility of merging returning some decrypted messages ?
+    }
+
+    /**
+     * Alternative way to add a member to a conversation.
+     * Instead of creating a join request accepted by the new client, this method directly adds a member to a conversation,
+     * and returns a welcome message to be sent to the new member.
+     */
+    fun addMemberToConversation(mlsGroupId: String, keyPackages: List<ByteArray>): ByteArray? {
+        val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
+        val commitBundle = runBlocking { mlsClient.addMember(MLSGroupId(mlsGroupIdBytes), keyPackages.map { MLSKeyPackage(it) }) }
+        return commitBundle.welcome?.value;
+    }
+
+    fun acceptLatestCommit(mlsGroupId: String) {
+        val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
+        runBlocking { mlsClient.commitAccepted(MLSGroupId(mlsGroupIdBytes)) }
     }
 
     override fun close() {

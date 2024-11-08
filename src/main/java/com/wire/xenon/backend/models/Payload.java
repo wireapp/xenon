@@ -52,7 +52,6 @@ public class Payload {
     public String time;
 
     @JsonProperty
-//    @JsonDeserialize(using = Data.Deserializer.class)
     public Data data;
 
     @JsonProperty
