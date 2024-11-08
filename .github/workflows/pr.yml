@@ -33,3 +33,6 @@ jobs:
       - name: Try to create package
         run: |
           mvn package -DskipTests
+
+      - name: Generate Javadoc
+        run: mvn -DskipTests site
