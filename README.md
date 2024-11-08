@@ -30,6 +30,6 @@ Other functionalities:
 
 Requirements:
 
-- [Java >= 11](http://www.oracle.com)
+- [Java >= 17](http://www.oracle.com)
 - [Maven](https://maven.apache.org)
 - [Cryptobox4j](https://github.com/wireapp/cryptobox4j)
