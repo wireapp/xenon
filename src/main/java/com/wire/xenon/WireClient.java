@@ -132,7 +132,7 @@ public interface WireClient extends Closeable {
     void acceptConnection(QualifiedId user) throws Exception;
 
     /**
-     * Decrypt cipher either using existing session or it creates new session from this cipher and decrypts
+     * Decrypt Proteus cipher either using existing session or it creates new session from this cipher and decrypts
      *
      * @param userId   Sender's User id
      * @param clientId Sender's Client id
@@ -140,7 +140,38 @@ public interface WireClient extends Closeable {
      * @return Base64 encoded decrypted text
      * @throws CryptoException
      */
-    String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException;
+    String decryptProteus(QualifiedId userId, String clientId, String cypher) throws CryptoException;
+
+    /**
+     * Decrypt MLS cipher either using existing group.
+     *
+     * @param mlsGroupId   mls reference of the conversation owning this message
+     * @param cypher   Encrypted, Base64 encoded string
+     * @return byte array of decrypted text, according to protobuf definition
+     */
+    byte[] decryptMls(String mlsGroupId, String cypher);
+
+    /**
+     * Fetch the default public key (SHA256) of the initialized MLS client and upload it to the backend
+     */
+    void updateClientWithMlsPublicKey();
+
+    /**
+     * Generate (or fetch if available) a specified amount of MLS KeyPackages and upload them to the backend
+     *
+     * @param keyPackageAmount the amount of key packages to generate and upload
+     */
+    void uploadMlsKeyPackages(int keyPackageAmount);
+
+    /**
+     * Ask the backend for this device to join the specified MLS conversation.
+     * THe MLS data for the client needs to be already established and present in the backend.
+     * If accepted, the conversation will be marked as joined on the backend and locally in core-crypto storage.
+     *
+     * @param conversationId the conversation to join
+     * @param mlsGroupId the MLS groupId of the conversation to join
+     */
+    void joinMlsConversation(QualifiedId conversationId, String mlsGroupId);
 
     /**
      * Invoked by the sdk. Called once when the conversation is created

@@ -3,11 +3,10 @@ package com.wire.xenon;
 import com.wire.bots.cryptobox.CryptoException;
 import com.wire.xenon.assets.IAsset;
 import com.wire.xenon.assets.IGeneric;
-import com.wire.xenon.backend.models.Conversation;
-import com.wire.xenon.backend.models.NewBot;
-import com.wire.xenon.backend.models.QualifiedId;
-import com.wire.xenon.backend.models.User;
+import com.wire.xenon.backend.KeyPackageUpdate;
+import com.wire.xenon.backend.models.*;
 import com.wire.xenon.crypto.Crypto;
+import com.wire.xenon.crypto.mls.CryptoMlsClient;
 import com.wire.xenon.exceptions.HttpException;
 import com.wire.xenon.models.AssetKey;
 import com.wire.xenon.models.otr.*;
@@ -21,12 +20,14 @@ import java.util.*;
 public class WireClientBase implements WireClient {
     protected final WireAPI api;
     protected final Crypto crypto;
+    protected final CryptoMlsClient cryptoMlsClient;
     protected final NewBot state;
     protected Devices devices = null;
 
-    public WireClientBase(WireAPI api, Crypto crypto, NewBot state) {
+    public WireClientBase(WireAPI api, Crypto crypto, CryptoMlsClient cryptoMlsClient, NewBot state) {
         this.api = api;
         this.crypto = crypto;
+        this.cryptoMlsClient = cryptoMlsClient;
         this.state = state;
     }
 
@@ -58,15 +59,17 @@ public class WireClientBase implements WireClient {
     @Override
     public void close() throws IOException {
         crypto.close();
+        cryptoMlsClient.close();
     }
 
     @Override
     public boolean isClosed() {
+        // This method is unused, no need to add Core-Crypto handling.
         return crypto.isClosed();
     }
 
     /**
-     * Encrypt whole message for participants in the conversation.
+     * Encrypt whole message for participants in the Proteus conversation.
      * Implements the fallback for the 412 error code and missing
      * devices.
      *
@@ -103,8 +106,14 @@ public class WireClientBase implements WireClient {
         }
     }
 
+    /**
+     * Encrypt and send message to a specific user. Proteus only,.
+     * @param userId the user to send the message to
+     * @param generic generic message to be sent
+     * @throws Exception CryptoBox exception
+     */
     protected void postGenericMessage(IGeneric generic, QualifiedId userId) throws Exception {
-        // Try to encrypt the msg for those devices that we have the session already
+        // Try to encrypt the msg for those devices that we have the Proteus session already
         Missing all = getAllDevices();
         Missing missing = new Missing();
         for (QualifiedId u : all.toUserIds()) {
@@ -193,8 +202,43 @@ public class WireClientBase implements WireClient {
     }
 
     @Override
-    public String decrypt(QualifiedId userId, String clientId, String cypher) throws CryptoException {
+    public String decryptProteus(QualifiedId userId, String clientId, String cypher) throws CryptoException {
         return crypto.decrypt(userId, clientId, cypher);
+    }
+
+    @Override
+    public byte[] decryptMls(String mlsGroupId, String cypher) {
+        return cryptoMlsClient.decrypt(mlsGroupId, cypher);
+    }
+
+    @Override
+    public void updateClientWithMlsPublicKey() {
+        final byte[] publicKey = cryptoMlsClient.getPublicKey();
+        ClientUpdate.MlsPublicKeys mlsPublicKeys = new ClientUpdate.MlsPublicKeys();
+        mlsPublicKeys.ed25519 = Base64.getEncoder().encodeToString(publicKey);
+        ClientUpdate clientUpdate = new ClientUpdate();
+        clientUpdate.mlsPublicKeys = mlsPublicKeys;
+
+        api.uploadClientPublicKey(cryptoMlsClient.getId(), clientUpdate);
+    }
+
+    @Override
+    public void uploadMlsKeyPackages(int keyPackageAmount) {
+        final List<byte[]> keyPackages = cryptoMlsClient.generateKeyPackages(keyPackageAmount);
+        KeyPackageUpdate keyPackageUpdate = new KeyPackageUpdate();
+        keyPackageUpdate.keyPackages = keyPackages.stream().map(Base64.getEncoder()::encodeToString).toList();
+
+        api.uploadClientKeyPackages(cryptoMlsClient.getId(), keyPackageUpdate);
+    }
+
+    @Override
+    public void joinMlsConversation(QualifiedId conversationId, String mlsGroupId) {
+        final byte[] conversationGroupInfo = api.getConversationGroupInfo(conversationId);
+        final byte[] commitBundle = cryptoMlsClient.createJoinConversationRequest(conversationGroupInfo);
+        api.commitMlsBundle(commitBundle);
+        // TODO some error recovery
+
+        cryptoMlsClient.markConversationAsJoined(mlsGroupId);
     }
 
     @Override

@@ -31,6 +31,8 @@ public class RemoteMessage extends MessageBase {
     @JsonProperty
     private String assetToken;
     @JsonProperty
+    private String assetDomain;
+    @JsonProperty
     private byte[] otrKey;
     @JsonProperty
     private byte[] sha256;
@@ -44,12 +46,14 @@ public class RemoteMessage extends MessageBase {
                          @JsonProperty("time") String time,
                          @JsonProperty("assetId") String assetId,
                          @JsonProperty("assetToken") String assetToken,
+                         @JsonProperty("assetDomain") String assetDomain,
                          @JsonProperty("otrKey") byte[] otrKey,
                          @JsonProperty("sha256") byte[] sha256) {
         super(eventId, messageId, convId, clientId, userId, time);
 
         setAssetId(assetId);
         setAssetToken(assetToken);
+        setAssetDomain(assetDomain);
         setSha256(sha256);
         setOtrKey(otrKey);
     }
@@ -59,6 +63,7 @@ public class RemoteMessage extends MessageBase {
 
         setAssetId(uploaded.getAssetId());
         setAssetToken(uploaded.getAssetToken());
+        setAssetDomain(uploaded.getAssetDomain());
         setSha256(uploaded.getSha256().toByteArray());
         setOtrKey(uploaded.getOtrKey().toByteArray());
     }
@@ -69,6 +74,14 @@ public class RemoteMessage extends MessageBase {
 
     public void setAssetToken(String assetToken) {
         this.assetToken = assetToken;
+    }
+
+    public String getAssetDomain() {
+        return assetDomain;
+    }
+
+    public void setAssetDomain(String assetDomain) {
+        this.assetDomain = assetDomain;
     }
 
     public byte[] getOtrKey() {

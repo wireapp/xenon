@@ -8,6 +8,7 @@ import com.wire.xenon.backend.models.*;
 import com.wire.xenon.models.MessageBase;
 import com.wire.xenon.tools.Logger;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -27,11 +28,11 @@ public abstract class MessageResourceBase {
             case "conversation.otr-message-add":
                 QualifiedId from = payload.from;
 
-                Logger.debug("conversation.otr-message-add: bot: %s from: %s:%s", botId, from, data.sender);
+                Logger.info("conversation.otr-message-add: bot: %s from: %s:%s", botId, from, data.sender);
 
                 GenericMessageProcessor processor = new GenericMessageProcessor(client, handler);
 
-                Messages.GenericMessage genericMessage = decrypt(client, payload);
+                Messages.GenericMessage genericMessage = decryptProteus(client, payload);
 
                 final UUID messageId = UUID.fromString(genericMessage.getMessageId());
                 MessageBase msgBase = new MessageBase(eventId, messageId, payload.conversation, data.sender, from, payload.time);
@@ -39,6 +40,22 @@ public abstract class MessageResourceBase {
                 processor.process(msgBase, genericMessage);
 
                 handler.onEvent(client, from, genericMessage);
+                break;
+            case "conversation.mls-message-add":
+                QualifiedId fromMls = payload.from;
+
+                Logger.info("conversation.mls-message-add: bot: %s from: %s:%s", botId, fromMls, data.sender);
+
+                GenericMessageProcessor processorMls = new GenericMessageProcessor(client, handler);
+
+                Messages.GenericMessage genericMessageMls = decryptMls(client, payload);
+
+                final UUID messageIdMls = UUID.fromString(genericMessageMls.getMessageId());
+                MessageBase msgBaseMls = new MessageBase(eventId, messageIdMls, payload.conversation, data.sender, fromMls, payload.time);
+
+                processorMls.process(msgBaseMls, genericMessageMls);
+
+                handler.onEvent(client, fromMls, genericMessageMls);
                 break;
             case "conversation.member-join":
                 Logger.debug("conversation.member-join: bot: %s", botId);
@@ -92,8 +109,12 @@ public abstract class MessageResourceBase {
                 systemMessage = getSystemMessage(eventId, payload);
                 if (systemMessage.conversation.members != null) {
                     Member self = new Member();
-                    self.id = new QualifiedId(botId, null);
-                    systemMessage.conversation.members.add(self);
+                    String selfDomain = null;
+                    if (systemMessage.conversation != null && systemMessage.conversation.id != null) {
+                        selfDomain = systemMessage.conversation.id.domain;
+                    }
+                    self.id = new QualifiedId(botId, selfDomain);
+                    systemMessage.conversation.members.others.add(self);
                 }
 
                 handler.onNewConversation(client, systemMessage);
@@ -145,20 +166,31 @@ public abstract class MessageResourceBase {
             systemMessage.conversation.creator = payload.data.creator;
             systemMessage.conversation.name = payload.data.name;
             if (payload.data.members != null)
-                systemMessage.conversation.members = payload.data.members.others;
+                systemMessage.conversation.members = new Payload.Members();
+                systemMessage.conversation.members.others = payload.data.members.others;
         }
 
         return systemMessage;
     }
 
-    private Messages.GenericMessage decrypt(WireClient client, Payload payload)
+    private Messages.GenericMessage decryptProteus(WireClient client, Payload payload)
             throws CryptoException, InvalidProtocolBufferException {
         QualifiedId from = payload.from;
         String sender = payload.data.sender;
         String cipher = payload.data.text;
 
-        String encoded = client.decrypt(from, sender, cipher);
+        String encoded = client.decryptProteus(from, sender, cipher);
         byte[] decoded = Base64.getDecoder().decode(encoded);
+        return Messages.GenericMessage.parseFrom(decoded);
+    }
+
+    private Messages.GenericMessage decryptMls(WireClient client, Payload payload)
+        throws IOException {
+        String mlsGroupId = client.getConversation().mlsGroupId;
+        Logger.info("Fetched MLS group id: %s from conversation id: %s", mlsGroupId, payload.conversation);
+        String cipher = payload.data.text;
+
+        byte[] decoded = client.decryptMls(mlsGroupId, cipher);
         return Messages.GenericMessage.parseFrom(decoded);
     }
 }

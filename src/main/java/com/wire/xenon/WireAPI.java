@@ -1,6 +1,8 @@
 package com.wire.xenon;
 
 import com.wire.xenon.assets.IAsset;
+import com.wire.xenon.backend.KeyPackageUpdate;
+import com.wire.xenon.backend.models.ClientUpdate;
 import com.wire.xenon.backend.models.Conversation;
 import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.backend.models.User;
@@ -53,4 +55,16 @@ public interface WireAPI {
     boolean hasDevice(QualifiedId userId, String clientId);
 
     void acceptConnection(QualifiedId user) throws Exception;
+
+    boolean isMlsEnabled(); // Calls GET /mls/public-keys and GET /feature-configs, checking if MLS is enabled on the backend
+
+    void uploadClientPublicKey(String clientId, ClientUpdate clientUpdate); // Calls PUT /clients/{clientId}
+
+    void uploadClientKeyPackages(String clientId, KeyPackageUpdate keyPackageUpdate); // Calls POST /mls/key-packages/self/{client}
+
+    byte[] getConversationGroupInfo(QualifiedId conversationId); // Calls GET /conversations/{cnv_domain}/{cnv}/groupinfo returns a response with type message/mls, should be returned as byte array
+
+    void commitMlsBundle(byte[] commitBundle); // Calls POST /mls/commit-bundles, we care only if it is successful, no need to return anything
+
+    List<Conversation> getUserConversations(); // Calls POST /conversations/list-ids (paginated) to get all the user's id, then calls POST /conversations/list passing the ids. Returns lists of conversations
 }

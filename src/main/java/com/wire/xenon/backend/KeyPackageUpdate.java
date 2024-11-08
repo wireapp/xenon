@@ -16,41 +16,17 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-package com.wire.xenon.backend.models;
+package com.wire.xenon.backend;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.UUID;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Conversation {
-    @JsonProperty("qualified_id")
-    @JsonAlias("qualified_conversation")
-    public QualifiedId id;
-
-    @JsonProperty
-    public String name;
-
-    @JsonProperty("mls_group_id")
-    @JsonAlias("group_id")
-    public String mlsGroupId;
-
-    @JsonProperty
-    public Protocol protocol;
-
-    @JsonProperty
-    public UUID creator;
-    
-    @JsonProperty
-    public Payload.Members members;
-
-    public enum Protocol {
-        @JsonProperty("proteus") PROTEUS,
-        @JsonProperty("mls") MLS,
-        @JsonProperty("mixed") MIXED
-    }
+public class KeyPackageUpdate {
+    @JsonProperty("key_packages")
+    public List<String> keyPackages;
 }
