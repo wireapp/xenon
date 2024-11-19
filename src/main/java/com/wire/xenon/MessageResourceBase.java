@@ -80,9 +80,8 @@ public abstract class MessageResourceBase {
                     return;
                 }
 
-                // Check if we still have some prekeys and keyPackages available. Upload them if needed
+                // Check if we still have some prekeys available. Upload them if needed
                 handler.validatePreKeys(client, participants.size());
-                client.checkAndReplenishKeyPackages();
 
                 SystemMessage systemMessage = getSystemMessage(eventId, payload);
                 systemMessage.users = data.userIds;
@@ -117,9 +116,9 @@ public abstract class MessageResourceBase {
                 Logger.debug("conversation.create: bot: %s", botId);
 
                 systemMessage = getSystemMessage(eventId, payload);
-                Integer otherMembers = PREKEYS_DEFAULT_REPLENISH;
+                Integer preKeysUserCount = PREKEYS_DEFAULT_REPLENISH;
                 if (systemMessage.conversation.members != null) {
-                    otherMembers = systemMessage.conversation.members.others.size();
+                    preKeysUserCount = systemMessage.conversation.members.others.size();
                     Member self = new Member();
                     String selfDomain = null;
                     if (systemMessage.conversation.id != null) {
@@ -130,8 +129,11 @@ public abstract class MessageResourceBase {
                 }
 
                 // Check if we still have some prekeys and keyPackages available. Upload them if needed
-                handler.validatePreKeys(client, otherMembers);
-                client.checkAndReplenishKeyPackages();
+                if (systemMessage.conversation.protocol == Conversation.Protocol.PROTEUS)
+                    handler.validatePreKeys(client, preKeysUserCount);
+                else {
+                    client.checkAndReplenishKeyPackages();
+                }
 
                 handler.onNewConversation(client, systemMessage);
                 break;
