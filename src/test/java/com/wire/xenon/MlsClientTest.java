@@ -57,9 +57,12 @@ public class MlsClientTest {
 
         // Create a new client and join the conversation
         CryptoMlsClient mlsClient = new CryptoMlsClient(client1, "pwd");
+        assert !mlsClient.conversationExists(groupIdBase64);
         final byte[] commitBundle = mlsClient.createJoinConversationRequest(groupInfo);
         assert commitBundle.length > groupInfo.length;
         mlsClient.markConversationAsJoined(groupIdBase64);
+        assert mlsClient.conversationExists(groupIdBase64);
+
         // Encrypt a message for the joined conversation
         String plainMessage = UUID.randomUUID().toString();
         final byte[] encryptedMessage = mlsClient.encrypt(groupIdBase64, plainMessage.getBytes());
@@ -91,17 +94,22 @@ public class MlsClientTest {
 
         // Create a new client and join the conversation
         CryptoMlsClient mlsClient = new CryptoMlsClient(client1, "pwd");
+        assert !mlsClient.conversationExists(groupIdBase64);
         final byte[] commitBundle = mlsClient.createJoinConversationRequest(groupInfo);
         assert commitBundle.length > groupInfo.length;
         mlsClient.markConversationAsJoined(groupIdBase64);
+        assert mlsClient.conversationExists(groupIdBase64);
 
         // Create a second client and make the first client invite the second one
         String client2 = "bob1_" + UUID.randomUUID();
         CryptoMlsClient mlsClient2 = new CryptoMlsClient(client2, "pwd");
+        assert !mlsClient2.conversationExists(groupIdBase64);
         final List<byte[]> keyPackages = mlsClient2.generateKeyPackages(1);
         final byte[] welcome = mlsClient.addMemberToConversation(groupIdBase64, keyPackages);
         mlsClient.acceptLatestCommit(groupIdBase64);
-        mlsClient2.welcomeMessage(welcome);
+        String welcomeBase64 = new String(Base64.getEncoder().encode(welcome));
+        mlsClient2.processWelcomeMessage(welcomeBase64);
+        assert mlsClient2.conversationExists(groupIdBase64);
 
         // Encrypt a message for the joined conversation
         String plainMessage = UUID.randomUUID().toString();

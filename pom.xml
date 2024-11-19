@@ -6,7 +6,7 @@
 
     <groupId>com.wire</groupId>
     <artifactId>xenon</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
 
     <name>Xenon</name>
     <description>Base Wire Bots Library</description>
@@ -116,6 +116,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.14.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version>
@@ -198,6 +204,12 @@
                 <groupId>org.jetbrains.dokka</groupId>
                 <artifactId>dokka-maven-plugin</artifactId>
                 <version>1.9.20</version>
+                <configuration>
+                    <sourceDirectories>
+                        <dir>${project.basedir}/src/main/java</dir>
+                        <dir>${project.basedir}/src/main/kotlin</dir>
+                    </sourceDirectories>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>compile</phase>
