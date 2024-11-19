@@ -233,12 +233,30 @@ public class WireClientBase implements WireClient {
 
     @Override
     public void joinMlsConversation(QualifiedId conversationId, String mlsGroupId) {
+        if (cryptoMlsClient.conversationExists(mlsGroupId)) {
+            Logger.info("Conversation %s already exists, ignore it", conversationId);
+            return;
+        }
         final byte[] conversationGroupInfo = api.getConversationGroupInfo(conversationId);
         final byte[] commitBundle = cryptoMlsClient.createJoinConversationRequest(conversationGroupInfo);
         api.commitMlsBundle(commitBundle);
-        // TODO some error recovery
+        // TODO Add error recovery, maybe a simple 3 times retry on api calls with quadratic backoff
 
         cryptoMlsClient.markConversationAsJoined(mlsGroupId);
+    }
+
+    @Override
+    public byte[] processWelcomeMessage(String welcome) {
+        checkAndReplenishKeyPackages();
+        return cryptoMlsClient.processWelcomeMessage(welcome);
+    }
+
+    @Override
+    public void checkAndReplenishKeyPackages() {
+        if (cryptoMlsClient.validKeyPackageCount() < KEY_PACKAGES_LOWER_THRESHOLD) {
+            Logger.info("Too few Key packages, replenish them");
+            cryptoMlsClient.generateKeyPackages(KEY_PACKAGES_REPLENISH_AMOUNT);
+        }
     }
 
     @Override

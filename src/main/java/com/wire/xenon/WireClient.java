@@ -40,6 +40,9 @@ import java.util.UUID;
  */
 public interface WireClient extends Closeable {
 
+    Integer KEY_PACKAGES_LOWER_THRESHOLD = 10;
+    Integer KEY_PACKAGES_REPLENISH_AMOUNT = 50;
+
     /**
      * Post a generic message into conversation
      *
@@ -172,6 +175,20 @@ public interface WireClient extends Closeable {
      * @param mlsGroupId the MLS groupId of the conversation to join
      */
     void joinMlsConversation(QualifiedId conversationId, String mlsGroupId);
+
+    /**
+     * When a mls-welcome event is received, this method is called to process it.
+     * It will create a MLS conversation record in the local core-crypto storage.
+     * @param welcome base64 encoded welcome message
+     * @return the MLS group id of the conversation
+     */
+    byte[] processWelcomeMessage(String welcome);
+
+    /**
+     * Checks if the number of available key packages is below the threshold and replenishes them if necessary.
+     * NOTE: Will make an API call to publish the new key packages if needed.
+     */
+    void checkAndReplenishKeyPackages();
 
     /**
      * Invoked by the sdk. Called once when the conversation is created

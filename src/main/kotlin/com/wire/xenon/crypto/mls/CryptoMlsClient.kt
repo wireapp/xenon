@@ -61,20 +61,23 @@ class CryptoMlsClient : Closeable {
         return keyPackages.map { it.value }
     }
 
-    // TODO handle conversation marked as complete, after both welcomeMessage and member-join events have been received,
-    // TODO remember checking there are enough key packages
-    // https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/563053166/Use+case+being+added+to+a+conversation+MLS
     /**
      * Process a welcome message, adding this client to a conversation, and return the group id.
      */
-    fun welcomeMessage(welcome: ByteArray): ByteArray {
-        val welcomeBundle = runBlocking { mlsClient.processWelcomeMessage(Welcome(welcome)) }
+    fun processWelcomeMessage(welcome: String): ByteArray {
+        val welcomeBytes: ByteArray = Base64.getDecoder().decode(welcome)
+        val welcomeBundle = runBlocking { mlsClient.processWelcomeMessage(Welcome(welcomeBytes)) }
         return welcomeBundle.id.value
     }
 
     fun validKeyPackageCount(): Long {
         val packageCount = runBlocking { mlsClient.validKeyPackageCount() }
         return packageCount.toLong()
+    }
+
+    fun conversationExists(mlsGroupId: String): Boolean {
+        val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
+        return runBlocking { mlsClient.conversationExists(MLSGroupId(mlsGroupIdBytes)) }
     }
 
     /**
@@ -97,9 +100,14 @@ class CryptoMlsClient : Closeable {
         return bundle.commit.value + bundle.groupInfoBundle.payload.value + (bundle.welcome?.value ?: ByteArray(0))
     }
 
+    /**
+     * Completes the process of joining a conversation.
+     * To be called after createJoinConversationRequest(), and having a successful response from the backend
+     * while uploading the commitBundle.
+     */
     fun markConversationAsJoined(mlsGroupId: String) {
         val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
-        val commitBundle = runBlocking { mlsClient.mergePendingGroupFromExternalCommit(MLSGroupId(mlsGroupIdBytes)) }
+        runBlocking { mlsClient.mergePendingGroupFromExternalCommit(MLSGroupId(mlsGroupIdBytes)) }
         // TODO support the possibility of merging returning some decrypted messages ?
     }
 

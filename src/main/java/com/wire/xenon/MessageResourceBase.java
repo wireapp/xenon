@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public abstract class MessageResourceBase {
     protected final MessageHandlerBase handler;
+    protected static final Integer PREKEYS_DEFAULT_REPLENISH = 10;
 
     public MessageResourceBase(MessageHandlerBase handler) {
         this.handler = handler;
@@ -57,6 +58,14 @@ public abstract class MessageResourceBase {
 
                 handler.onEvent(client, fromMls, genericMessageMls);
                 break;
+            case "conversation.mls-welcome":
+                Logger.info("conversation.mls-welcome: bot: %s in: %s", botId, payload.conversation);
+
+                client.processWelcomeMessage(payload.data.text);
+
+                SystemMessage welcomeSystemMessage = getSystemMessage(eventId, payload);
+                handler.onNewConversation(client, welcomeSystemMessage);
+                break;
             case "conversation.member-join":
                 Logger.debug("conversation.member-join: bot: %s", botId);
 
@@ -71,8 +80,9 @@ public abstract class MessageResourceBase {
                     return;
                 }
 
-                // Check if we still have some prekeys available. Upload new prekeys if needed
+                // Check if we still have some prekeys and keyPackages available. Upload them if needed
                 handler.validatePreKeys(client, participants.size());
+                client.checkAndReplenishKeyPackages();
 
                 SystemMessage systemMessage = getSystemMessage(eventId, payload);
                 systemMessage.users = data.userIds;
@@ -107,15 +117,21 @@ public abstract class MessageResourceBase {
                 Logger.debug("conversation.create: bot: %s", botId);
 
                 systemMessage = getSystemMessage(eventId, payload);
+                Integer otherMembers = PREKEYS_DEFAULT_REPLENISH;
                 if (systemMessage.conversation.members != null) {
+                    otherMembers = systemMessage.conversation.members.others.size();
                     Member self = new Member();
                     String selfDomain = null;
-                    if (systemMessage.conversation != null && systemMessage.conversation.id != null) {
+                    if (systemMessage.conversation.id != null) {
                         selfDomain = systemMessage.conversation.id.domain;
                     }
                     self.id = new QualifiedId(botId, selfDomain);
                     systemMessage.conversation.members.others.add(self);
                 }
+
+                // Check if we still have some prekeys and keyPackages available. Upload them if needed
+                handler.validatePreKeys(client, otherMembers);
+                client.checkAndReplenishKeyPackages();
 
                 handler.onNewConversation(client, systemMessage);
                 break;
