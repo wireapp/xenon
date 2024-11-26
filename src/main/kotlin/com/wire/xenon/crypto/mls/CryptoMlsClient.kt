@@ -147,20 +147,14 @@ class CryptoMlsClient(private val clientId: String, clientDatabaseKey: String) :
     }
 
     /**
-     * <p>
-     *     This function wipes current client MLS folder
-     * <p>
-     * <p>
-     *     - Closes CoreCrypto
-     *     - Verify if path exists and is a directory
-     *     - Deletes files and folder recursively
-     * <p>
-     * <p>Note(CoreCrypto)</p>
-     * <p>
-     *     There is an issue with `wipe()` function from `CoreCrypto`
-     *     When ticket [WPB-14514] is done we can then update and use it instead of deleting
-     *     the folder ourselves.
-     * </p>
+     * This method wipes current client MLS folder.
+     *
+     * - Closes CoreCrypto
+     * - Verify if path exists and is a directory
+     * - Deletes files and folder recursively
+     *
+     * Note(CoreCrypto): There is an issue with `wipe()` function from `CoreCrypto` when ticket [WPB-14514] is done,
+     * we can then update and use it instead of deleting the folder ourselves.
      */
     fun wipe() {
         this.close()
@@ -176,10 +170,9 @@ class CryptoMlsClient(private val clientId: String, clientDatabaseKey: String) :
 }
 
 /**
- * <p>
- *     Currently used for initializing CoreCrypto, but there is efforts on removing the necessity on newer
- *     versions of CoreCrypto.
- * <p>
+ * Dummy CoreCrypto Callbacks.
+ *
+ * Currently used for initializing CoreCrypto, but there is efforts on removing the necessity on newer versions of CoreCrypto.
  */
 private class CoreCryptoCallbacks : CoreCryptoCallbacks {
 
