@@ -1,8 +1,10 @@
 package com.wire.xenon.crypto.mls
 
+import com.wire.crypto.CoreCrypto
+import com.wire.crypto.CoreCryptoCallbacks
+import com.wire.crypto.client.Ciphersuites
 import com.wire.crypto.client.ClientId
 import com.wire.crypto.client.CommitBundle
-import com.wire.crypto.client.CoreCryptoCentral
 import com.wire.crypto.client.GroupInfo
 import com.wire.crypto.client.MLSClient
 import com.wire.crypto.client.MLSGroupId
@@ -10,31 +12,44 @@ import com.wire.crypto.client.MLSKeyPackage
 import com.wire.crypto.client.MlsMessage
 import com.wire.crypto.client.PlaintextMessage
 import com.wire.crypto.client.Welcome
+import com.wire.crypto.coreCryptoDeferredInit
 import kotlinx.coroutines.runBlocking
 import java.io.Closeable
+import java.io.File
+import java.nio.file.Paths
 import java.util.*
 
-class CryptoMlsClient : Closeable {
-    private var cryptoCentral: CoreCryptoCentral
+class CryptoMlsClient(private val clientId: String, clientDatabaseKey: String) : Closeable {
+    private var coreCrypto: CoreCrypto
     private var mlsClient: MLSClient
-    private val clientId: String
 
-    constructor(clientId: String, clientDatabaseKey: String) {
+    private companion object {
+        private const val KEYSTORE_NAME = "keystore"
+    }
+
+    init {
         runBlocking {
-            cryptoCentral = CoreCryptoCentral.invoke(
-                getDirectoryPath(clientId),
-                clientDatabaseKey)
-            mlsClient = cryptoCentral.mlsClient(ClientId(clientId))
+            val clientDirectoryPath = getDirectoryPath(clientId = clientId)
+            val path = "$clientDirectoryPath/$KEYSTORE_NAME"
+
+            File(clientDirectoryPath).mkdirs()
+
+            coreCrypto = coreCryptoDeferredInit(
+                path = path,
+                key = clientDatabaseKey
+            )
+            coreCrypto.setCallbacks(callbacks = CoreCryptoCallbacks())
+            mlsClient = MLSClient(cc = coreCrypto).apply {
+                mlsInit(id = ClientId(clientId), Ciphersuites.DEFAULT)
+            }
         }
-        this.clientId = clientId
     }
 
     fun getId(): String = clientId
+
     fun getCoreCryptoClient(): MLSClient = mlsClient
 
-    private fun getDirectoryPath(clientId: String): String {
-        return "mls/$clientId"
-    }
+    private fun getDirectoryPath(clientId: String): String = "mls/$clientId"
 
     fun encrypt(mlsGroupId: String, plainMessage: ByteArray): ByteArray? {
         val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
@@ -128,6 +143,51 @@ class CryptoMlsClient : Closeable {
     }
 
     override fun close() {
-        runBlocking { cryptoCentral.close() }
+        runBlocking { coreCrypto.close() }
     }
+
+    /**
+     * This method wipes current client MLS folder.
+     *
+     * - Closes CoreCrypto
+     * - Verify if path exists and is a directory
+     * - Deletes files and folder recursively
+     *
+     * Note(CoreCrypto): There is an issue with `wipe()` function from `CoreCrypto` when ticket [WPB-14514] is done,
+     * we can then update and use it instead of deleting the folder ourselves.
+     */
+    fun wipe() {
+        this.close()
+        runBlocking {
+            val path = Paths.get(getDirectoryPath(clientId = clientId))
+            val file = path.toFile()
+
+            if (file.exists() && file.isDirectory) {
+                file.deleteRecursively()
+            }
+        }
+    }
+}
+
+/**
+ * Dummy CoreCrypto Callbacks.
+ *
+ * Currently used for initializing CoreCrypto, but there is efforts on removing the necessity on newer versions of CoreCrypto.
+ */
+private class CoreCryptoCallbacks : CoreCryptoCallbacks {
+
+    override suspend fun authorize(conversationId: ByteArray, clientId: ByteArray): Boolean = true
+
+    override suspend fun userAuthorize(
+        conversationId: ByteArray,
+        externalClientId: ByteArray,
+        existingClients: List<ByteArray>
+    ): Boolean = true
+
+    override suspend fun clientIsExistingGroupUser(
+        conversationId: ByteArray,
+        clientId: ByteArray,
+        existingClients: List<ByteArray>,
+        parentConversationClients: List<ByteArray>?
+    ): Boolean = true
 }

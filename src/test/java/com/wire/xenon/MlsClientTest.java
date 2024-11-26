@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +17,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MlsClientTest {
+
     @Test
     public void testMlsClientInitialization() {
         String client1 = "alice1_" + UUID.randomUUID();
@@ -119,5 +123,23 @@ public class MlsClientTest {
 
         final byte[] decrypted = mlsClient2.decrypt(groupIdBase64, encryptedBase64Message);
         assert new String(decrypted).equals(plainMessage);
+    }
+
+    @Test
+    public void testMlsClientInitializationAndWipe() {
+        // given
+        String client = "wipe_" + UUID.randomUUID();
+        CryptoMlsClient cryptoMlsClient = new CryptoMlsClient(client, "pwd");
+        assert cryptoMlsClient != null;
+
+        Path path = Paths.get("mls/" + client);
+        boolean pathExists = Files.exists(path);
+        assert pathExists;
+
+        // when
+        cryptoMlsClient.wipe();
+
+        // then
+        assert Files.notExists(path);
     }
 }
