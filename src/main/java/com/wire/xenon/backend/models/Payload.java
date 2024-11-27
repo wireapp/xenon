@@ -109,14 +109,14 @@ public class Payload {
                 JsonNode node = jp.readValueAsTree();
                 if (node.isObject()) {
                     Data data = new Data();
-                    data.sender = node.get("sender").asText();
-                    data.recipient = node.get("recipient").asText();
-                    data.text = node.get("text").asText();
-                    data.userIds = jp.getCodec().readValue(node.get("qualified_user_ids").traverse(jp.getCodec()), new TypeReference<List<QualifiedId>>() {});
-                    data.users = jp.getCodec().readValue(node.get("users").traverse(jp.getCodec()), new TypeReference<List<User>>() {});
-                    data.name = node.get("name").asText();
-                    data.creator = node.get("creator").isTextual() ? UUID.fromString(node.get("creator").asText()) : null;
-                    data.members = jp.getCodec().readValue(node.get("members").traverse(jp.getCodec()), Members.class);
+                    data.sender = node.has("sender") ? node.get("sender").asText() : null;
+                    data.recipient = node.has("recipient") ? node.get("recipient").asText() : null;
+                    data.text = node.has("text") ? node.get("text").asText() : null;
+                    data.userIds = node.has("qualified_user_ids") ? jp.getCodec().readValue(node.get("qualified_user_ids").traverse(jp.getCodec()), new TypeReference<List<QualifiedId>>() {}): null;
+                    data.users = node.has("users") ? jp.getCodec().readValue(node.get("users").traverse(jp.getCodec()), new TypeReference<List<User>>() {}) : null;
+                    data.name = node.has("name") ? node.get("name").asText() : null;
+                    data.creator = node.has("creator") && node.get("creator").isTextual() ? UUID.fromString(node.get("creator").asText()) : null;
+                    data.members = node.has("members") ? jp.getCodec().readValue(node.get("members").traverse(jp.getCodec()), Members.class) : null;
                     return data;
                 } else if (node.isTextual()) {
                     Data data = new Data();
