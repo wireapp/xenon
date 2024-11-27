@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -112,8 +113,8 @@ public class Payload {
                     data.sender = node.has("sender") ? node.get("sender").asText() : null;
                     data.recipient = node.has("recipient") ? node.get("recipient").asText() : null;
                     data.text = node.has("text") ? node.get("text").asText() : null;
-                    data.userIds = node.has("qualified_user_ids") ? jp.getCodec().readValue(node.get("qualified_user_ids").traverse(jp.getCodec()), new TypeReference<List<QualifiedId>>() {}): null;
-                    data.users = node.has("users") ? jp.getCodec().readValue(node.get("users").traverse(jp.getCodec()), new TypeReference<List<User>>() {}) : null;
+                    data.userIds = node.has("qualified_user_ids") ? jp.getCodec().readValue(node.get("qualified_user_ids").traverse(jp.getCodec()), new TypeReference<List<QualifiedId>>() {}): new ArrayList<>();
+                    data.users = node.has("users") ? jp.getCodec().readValue(node.get("users").traverse(jp.getCodec()), new TypeReference<List<User>>() {}) : new ArrayList<>();
                     data.name = node.has("name") ? node.get("name").asText() : null;
                     data.creator = node.has("creator") && node.get("creator").isTextual() ? UUID.fromString(node.get("creator").asText()) : null;
                     data.members = node.has("members") ? jp.getCodec().readValue(node.get("members").traverse(jp.getCodec()), Members.class) : null;
