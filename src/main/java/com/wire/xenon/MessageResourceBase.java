@@ -71,7 +71,7 @@ public abstract class MessageResourceBase {
 
                 // Check if this bot got added to the conversation
                 List<QualifiedId> participants = data.userIds;
-                if (participants.remove(botId)) {
+                if (participants.remove(new QualifiedId(botId, null))) {
                     SystemMessage systemMessage = getSystemMessage(eventId, payload);
                     systemMessage.conversation = client.getConversation();
                     systemMessage.type = "conversation.create"; //hack the type
@@ -96,7 +96,7 @@ public abstract class MessageResourceBase {
 
                 // Check if this bot got removed from the conversation
                 participants = data.userIds;
-                if (participants.remove(botId)) {
+                if (participants.remove(new QualifiedId(botId, null))) {
                     handler.onBotRemoved(botId, systemMessage);
                     return;
                 }
@@ -183,9 +183,10 @@ public abstract class MessageResourceBase {
         if (payload.data != null) {
             systemMessage.conversation.creator = payload.data.creator;
             systemMessage.conversation.name = payload.data.name;
-            if (payload.data.members != null)
+            if (payload.data.members != null) {
                 systemMessage.conversation.members = new Payload.Members();
                 systemMessage.conversation.members.others = payload.data.members.others;
+            }
         }
 
         return systemMessage;
