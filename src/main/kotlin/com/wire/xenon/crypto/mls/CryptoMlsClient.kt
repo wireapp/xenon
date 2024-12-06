@@ -13,13 +13,14 @@ import com.wire.crypto.client.MlsMessage
 import com.wire.crypto.client.PlaintextMessage
 import com.wire.crypto.client.Welcome
 import com.wire.crypto.coreCryptoDeferredInit
+import com.wire.xenon.backend.models.QualifiedId
 import kotlinx.coroutines.runBlocking
 import java.io.Closeable
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
 
-class CryptoMlsClient(private val clientId: String, clientDatabaseKey: String) : Closeable {
+class CryptoMlsClient(private val clientId: String, private val userId: QualifiedId, clientDatabaseKey: String) : Closeable {
     private var coreCrypto: CoreCrypto
     private var mlsClient: MLSClient
 
@@ -29,7 +30,7 @@ class CryptoMlsClient(private val clientId: String, clientDatabaseKey: String) :
 
     init {
         runBlocking {
-            val clientDirectoryPath = getDirectoryPath(clientId = clientId)
+            val clientDirectoryPath = getDirectoryPath()
             val path = "$clientDirectoryPath/$KEYSTORE_NAME"
 
             File(clientDirectoryPath).mkdirs()
@@ -40,16 +41,17 @@ class CryptoMlsClient(private val clientId: String, clientDatabaseKey: String) :
             )
             coreCrypto.setCallbacks(callbacks = CoreCryptoCallbacks())
             mlsClient = MLSClient(cc = coreCrypto).apply {
-                mlsInit(id = ClientId(clientId), Ciphersuites.DEFAULT)
+                mlsInit(id = ClientId(getCoreCryptoId()), Ciphersuites.DEFAULT)
             }
         }
     }
 
     fun getId(): String = clientId
-
     fun getCoreCryptoClient(): MLSClient = mlsClient
 
-    private fun getDirectoryPath(clientId: String): String = "mls/$clientId"
+    // Fully qualified id for the client, allowing to push key packages to the backend
+    private fun getCoreCryptoId(): String = "${userId.id}:$clientId@${userId.domain}"
+    private fun getDirectoryPath(): String = "mls/$clientId"
 
     fun encrypt(mlsGroupId: String, plainMessage: ByteArray): ByteArray? {
         val mlsGroupIdBytes: ByteArray = Base64.getDecoder().decode(mlsGroupId)
@@ -159,7 +161,7 @@ class CryptoMlsClient(private val clientId: String, clientDatabaseKey: String) :
     fun wipe() {
         this.close()
         runBlocking {
-            val path = Paths.get(getDirectoryPath(clientId = clientId))
+            val path = Paths.get(getDirectoryPath())
             val file = path.toFile()
 
             if (file.exists() && file.isDirectory) {

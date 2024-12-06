@@ -1,6 +1,7 @@
 package com.wire.xenon;
 
 import com.wire.crypto.CoreCryptoException;
+import com.wire.xenon.backend.models.QualifiedId;
 import com.wire.xenon.crypto.mls.CryptoMlsClient;
 import org.junit.jupiter.api.Test;
 
@@ -20,14 +21,15 @@ public class MlsClientTest {
 
     @Test
     public void testMlsClientInitialization() {
+        QualifiedId user1 = new QualifiedId(UUID.randomUUID(), "wire.com");
         String client1 = "alice1_" + UUID.randomUUID();
-        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, "pwd");
+        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, "pwd");
         assert mlsClient != null;
         mlsClient.close();
 
-        CryptoMlsClient mlsSameClient = new CryptoMlsClient(client1, "pwd");
+        CryptoMlsClient mlsSameClient = new CryptoMlsClient(client1, user1, "pwd");
         assert mlsSameClient != null;
-        assert mlsSameClient.getId().equals(client1);
+        assert mlsSameClient.getId().equals(mlsClient.getId());
 
         final byte[] publicKey = mlsSameClient.getPublicKey();
         assert publicKey.length > 10;
@@ -40,17 +42,17 @@ public class MlsClientTest {
     @Test
     public void testMlsClientFailOnDifferentPassword(){
         String client1 = "alice1_" + UUID.randomUUID();
-        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, "pwd");
+        QualifiedId user1 = new QualifiedId(UUID.randomUUID(), "wire.com");
+        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, "pwd");
         assert mlsClient != null;
         mlsClient.close();
 
-        assertThrows(CoreCryptoException.class, () -> {
-            new CryptoMlsClient(client1, "WRONG_PASSWORD");
-        });
+        assertThrows(CoreCryptoException.class, () -> new CryptoMlsClient(client1, user1, "WRONG_PASSWORD"));
     }
 
     @Test
     public void testMlsClientCreateConversationAndEncrypt() throws IOException {
+        QualifiedId user1 = new QualifiedId(UUID.randomUUID(), "wire.com");
         String client1 = "alice1_" + UUID.randomUUID();
         // Group ID in base64 format, copied from a real one
         String groupIdBase64 = "AAEAAliWyGZ3/FqGpDPZdcuLQ0UAYW50YS53aXJlLmxpbms=";
@@ -60,7 +62,7 @@ public class MlsClientTest {
         byte[] groupInfo = inputStream.readAllBytes();
 
         // Create a new client and join the conversation
-        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, "pwd");
+        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, "pwd");
         assert !mlsClient.conversationExists(groupIdBase64);
         final byte[] commitBundle = mlsClient.createJoinConversationRequest(groupInfo);
         assert commitBundle.length > groupInfo.length;
@@ -88,6 +90,7 @@ public class MlsClientTest {
 
     @Test
     public void testMlsClientsEncryptAndDecrypt() throws IOException {
+        QualifiedId user1 = new QualifiedId(UUID.randomUUID(), "wire.com");
         String client1 = "alice1_" + UUID.randomUUID();
         // Group ID in base64 format, copied from a real one
         String groupIdBase64 = "AAEAAliWyGZ3/FqGpDPZdcuLQ0UAYW50YS53aXJlLmxpbms=";
@@ -97,7 +100,7 @@ public class MlsClientTest {
         byte[] groupInfo = inputStream.readAllBytes();
 
         // Create a new client and join the conversation
-        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, "pwd");
+        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, "pwd");
         assert !mlsClient.conversationExists(groupIdBase64);
         final byte[] commitBundle = mlsClient.createJoinConversationRequest(groupInfo);
         assert commitBundle.length > groupInfo.length;
@@ -105,8 +108,9 @@ public class MlsClientTest {
         assert mlsClient.conversationExists(groupIdBase64);
 
         // Create a second client and make the first client invite the second one
+        QualifiedId user2 = new QualifiedId(UUID.randomUUID(), "wire.com");
         String client2 = "bob1_" + UUID.randomUUID();
-        CryptoMlsClient mlsClient2 = new CryptoMlsClient(client2, "pwd");
+        CryptoMlsClient mlsClient2 = new CryptoMlsClient(client2, user2, "pwd");
         assert !mlsClient2.conversationExists(groupIdBase64);
         final List<byte[]> keyPackages = mlsClient2.generateKeyPackages(1);
         final byte[] welcome = mlsClient.addMemberToConversation(groupIdBase64, keyPackages);
@@ -128,8 +132,9 @@ public class MlsClientTest {
     @Test
     public void testMlsClientInitializationAndWipe() {
         // given
+        QualifiedId user = new QualifiedId(UUID.randomUUID(), "wire.com");
         String client = "wipe_" + UUID.randomUUID();
-        CryptoMlsClient cryptoMlsClient = new CryptoMlsClient(client, "pwd");
+        CryptoMlsClient cryptoMlsClient = new CryptoMlsClient(client, user, "pwd");
         assert cryptoMlsClient != null;
 
         Path path = Paths.get("mls/" + client);

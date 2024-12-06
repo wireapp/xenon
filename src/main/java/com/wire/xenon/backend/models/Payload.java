@@ -113,7 +113,13 @@ public class Payload {
                     data.sender = node.has("sender") ? node.get("sender").asText() : null;
                     data.recipient = node.has("recipient") ? node.get("recipient").asText() : null;
                     data.text = node.has("text") ? node.get("text").asText() : null;
-                    data.userIds = node.has("qualified_user_ids") ? jp.getCodec().readValue(node.get("qualified_user_ids").traverse(jp.getCodec()), new TypeReference<List<QualifiedId>>() {}): new ArrayList<>();
+                    if (node.has("qualified_user_ids")) {
+                        data.userIds = jp.getCodec().readValue(node.get("qualified_user_ids").traverse(jp.getCodec()), new TypeReference<List<QualifiedId>>() {});
+                    } else if (node.has("user_ids")) {
+                        data.userIds = jp.getCodec().readValue(node.get("user_ids").traverse(jp.getCodec()), new TypeReference<List<QualifiedId>>() {});
+                    } else {
+                        data.userIds = new ArrayList<>();
+                    }
                     data.users = node.has("users") ? jp.getCodec().readValue(node.get("users").traverse(jp.getCodec()), new TypeReference<List<User>>() {}) : new ArrayList<>();
                     data.name = node.has("name") ? node.get("name").asText() : null;
                     data.creator = node.has("creator") && node.get("creator").isTextual() ? UUID.fromString(node.get("creator").asText()) : null;
