@@ -58,14 +58,12 @@ public class WireClientBase implements WireClient {
 
     @Override
     public void close() throws IOException {
-        crypto.close();
-        cryptoMlsClient.close();
-    }
-
-    @Override
-    public boolean isClosed() {
-        // This method is unused, no need to add Core-Crypto handling.
-        return crypto.isClosed();
+        if (crypto != null) {
+            crypto.close();
+        }
+        if (cryptoMlsClient != null) {
+            cryptoMlsClient.close();
+        }
     }
 
     /**

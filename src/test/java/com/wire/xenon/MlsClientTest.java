@@ -23,11 +23,11 @@ public class MlsClientTest {
     public void testMlsClientInitialization() {
         QualifiedId user1 = new QualifiedId(UUID.randomUUID(), "wire.com");
         String client1 = "alice1_" + UUID.randomUUID();
-        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, "pwd");
+        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, 2, "pwd");
         assert mlsClient != null;
         mlsClient.close();
 
-        CryptoMlsClient mlsSameClient = new CryptoMlsClient(client1, user1, "pwd");
+        CryptoMlsClient mlsSameClient = new CryptoMlsClient(client1, user1, 2,  "pwd");
         assert mlsSameClient != null;
         assert mlsSameClient.getId().equals(mlsClient.getId());
 
@@ -100,7 +100,7 @@ public class MlsClientTest {
         byte[] groupInfo = inputStream.readAllBytes();
 
         // Create a new client and join the conversation
-        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, "pwd");
+        CryptoMlsClient mlsClient = new CryptoMlsClient(client1, user1, 1, "pwd");
         assert !mlsClient.conversationExists(groupIdBase64);
         final byte[] commitBundle = mlsClient.createJoinConversationRequest(groupInfo);
         assert commitBundle.length > groupInfo.length;
@@ -110,7 +110,7 @@ public class MlsClientTest {
         // Create a second client and make the first client invite the second one
         QualifiedId user2 = new QualifiedId(UUID.randomUUID(), "wire.com");
         String client2 = "bob1_" + UUID.randomUUID();
-        CryptoMlsClient mlsClient2 = new CryptoMlsClient(client2, user2, "pwd");
+        CryptoMlsClient mlsClient2 = new CryptoMlsClient(client2, user2, 1, "pwd");
         assert !mlsClient2.conversationExists(groupIdBase64);
         final List<byte[]> keyPackages = mlsClient2.generateKeyPackages(1);
         final byte[] welcome = mlsClient.addMemberToConversation(groupIdBase64, keyPackages);
