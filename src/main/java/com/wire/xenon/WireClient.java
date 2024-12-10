@@ -226,13 +226,6 @@ public interface WireClient extends Closeable {
     ArrayList<Integer> getAvailablePrekeys();
 
     /**
-     * Checks if CryptoBox is closed
-     *
-     * @return True if crypto box is closed
-     */
-    boolean isClosed();
-
-    /**
      * Download publicly available profile picture for the given asset key. This asset is not encrypted
      *
      * @param assetKey Unique asset identifier (String)

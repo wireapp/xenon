@@ -2,6 +2,7 @@ package com.wire.xenon.crypto.mls
 
 import com.wire.crypto.CoreCrypto
 import com.wire.crypto.CoreCryptoCallbacks
+import com.wire.crypto.client.Ciphersuite
 import com.wire.crypto.client.Ciphersuites
 import com.wire.crypto.client.ClientId
 import com.wire.crypto.client.CommitBundle
@@ -20,13 +21,16 @@ import java.io.File
 import java.nio.file.Paths
 import java.util.*
 
-class CryptoMlsClient(private val clientId: String, private val userId: QualifiedId, clientDatabaseKey: String) : Closeable {
+class CryptoMlsClient (private val clientId: String, private val userId: QualifiedId, private val ciphersuite: Int, clientDatabaseKey: String) : Closeable {
     private var coreCrypto: CoreCrypto
     private var mlsClient: MLSClient
 
     private companion object {
         private const val KEYSTORE_NAME = "keystore"
+        private const val DEFAULT_CIPHERSUITE_IDENTIFIER = 1
     }
+
+    constructor(clientId: String, userId: QualifiedId, clientDatabaseKey: String) : this(clientId, userId, DEFAULT_CIPHERSUITE_IDENTIFIER, clientDatabaseKey)
 
     init {
         runBlocking {
@@ -41,7 +45,7 @@ class CryptoMlsClient(private val clientId: String, private val userId: Qualifie
             )
             coreCrypto.setCallbacks(callbacks = CoreCryptoCallbacks())
             mlsClient = MLSClient(cc = coreCrypto).apply {
-                mlsInit(id = ClientId(getCoreCryptoId()), Ciphersuites.DEFAULT)
+                mlsInit(id = ClientId(getCoreCryptoId()), Ciphersuites(setOf(getMlsCipherSuiteName(ciphersuite))))
             }
         }
     }
@@ -69,12 +73,15 @@ class CryptoMlsClient(private val clientId: String, private val userId: Qualifie
     }
 
     fun getPublicKey(): ByteArray {
-        val publicKey = runBlocking { mlsClient.getPublicKey() }
+        val publicKey = runBlocking { mlsClient.getPublicKey(getMlsCipherSuiteName(ciphersuite)) }
         return publicKey.value
     }
 
     fun generateKeyPackages(amount: Int): List<ByteArray> {
-        val keyPackages = runBlocking { mlsClient.generateKeyPackages(amount.toUInt()) }
+        val keyPackages = runBlocking { mlsClient.generateKeyPackages(
+            amount = amount.toUInt(),
+            ciphersuite = getMlsCipherSuiteName(ciphersuite)
+        ) }
         return keyPackages.map { it.value }
     }
 
@@ -88,7 +95,7 @@ class CryptoMlsClient(private val clientId: String, private val userId: Qualifie
     }
 
     fun validKeyPackageCount(): Long {
-        val packageCount = runBlocking { mlsClient.validKeyPackageCount() }
+        val packageCount = runBlocking { mlsClient.validKeyPackageCount(getMlsCipherSuiteName(ciphersuite)) }
         return packageCount.toLong()
     }
 
@@ -167,6 +174,19 @@ class CryptoMlsClient(private val clientId: String, private val userId: Qualifie
             if (file.exists() && file.isDirectory) {
                 file.deleteRecursively()
             }
+        }
+    }
+
+    private fun getMlsCipherSuiteName(code: Int): Ciphersuite {
+        return when (code) {
+            DEFAULT_CIPHERSUITE_IDENTIFIER -> Ciphersuite.DEFAULT
+            2 -> Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256
+            3 -> Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519
+            4 -> Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448
+            5 -> Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521
+            6 -> Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448
+            7 -> Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384
+            else -> Ciphersuite.DEFAULT
         }
     }
 }
