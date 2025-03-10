@@ -18,6 +18,7 @@
 
 package com.wire.xenon.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -36,7 +37,8 @@ public class ClientUpdate {
         @JsonProperty("ecdsa_secp384r1_sha384")
         public String ecdsaSecp384r1Sha384;
         @JsonProperty("ecdsa_secp521r1_sha512")
-        public String ecdsaSecp521r1Sha512;
+        @JsonAlias("ecdsa_secp521r1_sha521")
+        public String ecdsaSecp521r1Sha521;
         @JsonProperty("ed25519")
         public String ed25519;
     }
