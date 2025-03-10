@@ -14,6 +14,7 @@ import com.wire.crypto.client.MlsMessage
 import com.wire.crypto.client.PlaintextMessage
 import com.wire.crypto.client.Welcome
 import com.wire.crypto.coreCryptoDeferredInit
+import com.wire.xenon.backend.models.ClientUpdate.MlsPublicKeys
 import com.wire.xenon.backend.models.QualifiedId
 import kotlinx.coroutines.runBlocking
 import java.io.Closeable
@@ -187,6 +188,45 @@ class CryptoMlsClient (private val clientId: String, private val userId: Qualifi
             6 -> Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448
             7 -> Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384
             else -> Ciphersuite.DEFAULT
+        }
+    }
+
+    fun getPublicKeysToUpload(): MlsPublicKeys {
+        val key: ByteArray = this@CryptoMlsClient.getPublicKey()
+
+        val encodedKey = Base64.getEncoder().encodeToString(key)
+
+        when (getMlsCipherSuiteName(ciphersuite)) {
+            Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256 -> {
+                val mlsPublicKey256 = MlsPublicKeys()
+                mlsPublicKey256.ecdsaSecp256r1Sha256 = encodedKey
+                return mlsPublicKey256
+            }
+
+            Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384 -> {
+                val mlsPublicKey384 = MlsPublicKeys()
+                mlsPublicKey384.ecdsaSecp384r1Sha384 = encodedKey
+                return mlsPublicKey384
+            }
+
+            Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521 -> {
+                val mlsPublicKey521 = MlsPublicKeys()
+                mlsPublicKey521.ecdsaSecp521r1Sha521 = encodedKey
+                return mlsPublicKey521
+            }
+
+            Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519,
+            Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 -> {
+                val mlsPublicKey25519 = MlsPublicKeys()
+                mlsPublicKey25519.ed25519 = encodedKey
+                return mlsPublicKey25519
+            }
+
+            Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448,
+            Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448 ->
+                throw java.lang.IllegalArgumentException("Unsupported Ciphersuite - Ed448")
+
+            else -> throw IllegalArgumentException("Unsupported Ciphersuite")
         }
     }
 }

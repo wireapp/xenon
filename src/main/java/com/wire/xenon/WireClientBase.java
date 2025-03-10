@@ -1,6 +1,7 @@
 package com.wire.xenon;
 
 import com.wire.bots.cryptobox.CryptoException;
+import com.wire.crypto.client.Ciphersuite;
 import com.wire.xenon.assets.IAsset;
 import com.wire.xenon.assets.IGeneric;
 import com.wire.xenon.backend.KeyPackageUpdate;
@@ -211,11 +212,8 @@ public class WireClientBase implements WireClient {
 
     @Override
     public void updateClientWithMlsPublicKey() {
-        final byte[] publicKey = cryptoMlsClient.getPublicKey();
-        ClientUpdate.MlsPublicKeys mlsPublicKeys = new ClientUpdate.MlsPublicKeys();
-        mlsPublicKeys.ed25519 = Base64.getEncoder().encodeToString(publicKey);
         ClientUpdate clientUpdate = new ClientUpdate();
-        clientUpdate.mlsPublicKeys = mlsPublicKeys;
+        clientUpdate.mlsPublicKeys = cryptoMlsClient.getPublicKeysToUpload();
 
         api.uploadClientPublicKey(cryptoMlsClient.getId(), clientUpdate);
     }
